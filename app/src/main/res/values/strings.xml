@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Login_Register</string>
+    <string name="username_reminder">用户名5到10个字符</string>
+    <string name="username_empty_warning">× 请填写用户名 ×</string>
+    <string name="username_invalid_warning">× 用户名不符合要求 ×</string>
+    <string name="username_has_been_registered">× 用户名已被注册 ×</string>
+    <string name="username_ok">用户名有效</string>
+
+    <string name="psd_reminder">请输入6到10位数字或字母</string>
+    <string name="psd_invalid_warning">× 密码必须同时包含数字和字母，并且在6到10位之间 ×</string>
+    <string name="psd_empty_warning">× 密码不能为空 ×</string>
+    <string name="psd_ok">密码有效</string>
+
+    <string name="psd_match_reminder">再输入一遍密码</string>
+    <string name="psd_match_invalid_warning">× 两次密码不一样 ×</string>
+    <string name="psd_match_ok">密码确认成功</string>
+
+    <string name="phone_reminder">请输入有效手机号</string>
+    <string name="phone_invalid_warning">× 手机号无效 ×</string>
+    <string name="phone_ok">手机号有效</string>
+
+    <string name="shower_str11">其他方式绑定</string>
+    <string name="shower_str12">停止搜索</string>
+    <string name="shower_str4">搜索中</string>
+    <string name="shower_str5">未绑定</string>
+    <string name="shower_str6">搜索终止</string>
+</resources>
