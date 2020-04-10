@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.HidePsdUtil;
+import com.example.login_register.Utils.MD5Util;
 import com.example.login_register.Utils.ToastUtil;
 import com.google.i18n.phonenumbers.*;
 
@@ -85,20 +86,21 @@ public class RegisterActivity extends BaseActivity {
         mConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = mUsername.getText().toString();
-                String phoneNumber = mPhoneNumber.getText().toString();
-                String phoneCountry = mCountry.getText().toString();
-                String psd1 = mPassword1.getText().toString();
-                String psd2 = mPassword2.getText().toString();
+                String username = mUsername.getText().toString().trim();
+                String phoneNumber = mPhoneNumber.getText().toString().trim();
+                String phoneCountry = mCountry.getText().toString().trim();
+                String psd1 = mPassword1.getText().toString().trim();
+                String psd2 = mPassword2.getText().toString().trim();
+                String psdMD5 = MD5Util.encrypt(psd1);
 
                 if (mUsernameResult && mPhoneResult && mPsdResult && mPsdMatchResult) {
                     UserInfo userInfo = new UserInfo();
                     userInfo.setUsername(username);
-                    userInfo.setPassword(psd1);
+                    userInfo.setPassword(psdMD5);
                     userInfo.setPhoneNumber(phoneCountry + phoneNumber);
                     userInfo.save();
                     ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
-                    Intent intent = new Intent(RegisterActivity.this, OptionPickerActivity.class);
+                    Intent intent = new Intent(RegisterActivity.this, UserInfoActivity.class);
                     startActivity(intent);
                 } else {
                     mPassword1.setText("");
@@ -293,6 +295,7 @@ public class RegisterActivity extends BaseActivity {
             }
         });
     }
+
     public boolean psdMatch(String psd1, String psd2, TextView matchText) {
         if (psd1.equals(psd2)) {
             matchText.setText(R.string.psd_match_ok);

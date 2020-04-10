@@ -2,7 +2,9 @@ package com.example.login_register;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.UserManager;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import com.example.login_register.LitePalDatabase.DailyRecord;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
+import com.example.login_register.Utils.MD5Util;
 import com.example.login_register.Utils.ToastUtil;
 import com.mob.wrappers.UMSSDKWrapper;
 
@@ -28,6 +31,9 @@ public class LitePalActivity extends BaseActivity {
     private Button mBtnShow;
     private EditText mEtName,mEtPsd;
     private static final String TAG = "sql_tag" ;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,43 +45,48 @@ public class LitePalActivity extends BaseActivity {
         mEtName = findViewById(R.id.et_name);
         mEtPsd = findViewById(R.id.et_psd);
 
+
         /**
          * 方法1
          **/
-
-
         mCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //LitePal.getDatabase();
-                LitePal.deleteAll(DailyRecord.class);
-                LitePal.deleteAll(UserInfo.class);
+//                LitePal.deleteAll(DailyRecord.class);
+//                LitePal.deleteAll(UserInfo.class);
+                mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
+                mEditor = mSharedPreferences.edit();
+            mEditor.remove("MACAddress");
+            mEditor.apply();
             }
         });
 
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
-                Date date = new Date(System.currentTimeMillis());
+//                handler.removeCallbacks(runnable);
+//                String Psd = mEtPsd.getText().toString();
+//                String Name = mEtName.getText().toString();
+//                String UtilMD5 = MD5Util.encrypt(Psd);
+//                Log.d(TAG,UtilMD5);
+//                UserInfo userInfo = new UserInfo();
+//                userInfo.setUsername(Name);
+//                userInfo.setPassword(Psd);
+//                userInfo.save();
 
-                UserInfo userInfo = LitePal.findLast(UserInfo.class);
-                DailyRecord dailyRecord = new DailyRecord();
-                dailyRecord.setDate(simpleDateFormat.format(date));
-                dailyRecord.setStep(2000);
-                dailyRecord.setUserInfo(userInfo);
-                dailyRecord.save();
+                /**
+                * 保存时间*/
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+//                Date date = new Date(System.currentTimeMillis());
+//
+//                UserInfo userInfo = LitePal.findLast(UserInfo.class);
+//                DailyRecord dailyRecord = new DailyRecord();
+//                dailyRecord.setDate(simpleDateFormat.format(date));
+//                dailyRecord.setStep(2000);
+//                dailyRecord.setUserInfo(userInfo);
+//                dailyRecord.save();
 
-//                UserInfo userInfo2 = LitePal.findLast(UserInfo.class);
-//                DailyRecord dailyRecord2 = new DailyRecord();
-//                dailyRecord2.setDate("20200322");
-//                dailyRecord2.setStep(3000);
-//                dailyRecord2.setDate("20200323");
-//                dailyRecord2.setStep(3500);
-//                dailyRecord2.setUserInfo(userInfo2);
-//                dailyRecord2.save();
-//                    Log.d("Litepal",userInfo2.getUsername());
-//                    Log.d("Litepal",userInfo2.getPassword());
                 /**
                  * 检验是否重复*/
 //                String name = mEtName.getText().toString().trim();
@@ -137,16 +148,29 @@ public class LitePalActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                List<UserInfo> userInfos = LitePal.where("Username = ?","didiwa").find(UserInfo.class);
+                List<UserInfo> userInfos = LitePal.findAll(UserInfo.class);
                 for(UserInfo userInfo:userInfos){
-                    Log.d(TAG,String.valueOf(userInfo.getId()));
                     Log.d(TAG,userInfo.getUsername());
                     Log.d(TAG,userInfo.getPassword());
                     Log.d(TAG,userInfo.getPhoneNumber());
                     Log.d(TAG,userInfo.getBirthday());
                     Log.d(TAG,String.valueOf(userInfo.getAge()));
                     Log.d(TAG,userInfo.getLocation());
+                    Log.d(TAG,String.valueOf(userInfo.getHeight()));
+                    Log.d(TAG,String.valueOf(userInfo.getWeight()));
                 }
+//                List<UserInfo> userInfos = LitePal.where("Username = ?","didiwa").find(UserInfo.class);
+//                for(UserInfo userInfo:userInfos){
+//                    Log.d(TAG,String.valueOf(userInfo.getId()));
+//                    Log.d(TAG,userInfo.getUsername());
+//                    Log.d(TAG,userInfo.getPassword());
+//                    Log.d(TAG,userInfo.getPhoneNumber());
+//                    Log.d(TAG,userInfo.getBirthday());
+//                    Log.d(TAG,String.valueOf(userInfo.getAge()));
+//                    Log.d(TAG,userInfo.getLocation());
+//                }
+
+
 //                UserInfo userInfo = LitePal.find(UserInfo.class,22);
 //                if(userInfo == null){
 //                    Log.d(TAG,"null");

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs xmlns:android="http://schemas.android.com/apk/res/android">
+    <tab
+        id="@+id/tab1"
+        title="tab1" />
+    <tab
+        id="@+id/tab2"
+        title="tab2" />
+    <tab
+        id="@+id/tab3"
+        title="tab3" />
+</tabs>

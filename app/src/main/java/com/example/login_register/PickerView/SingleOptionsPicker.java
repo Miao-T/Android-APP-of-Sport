@@ -2,6 +2,7 @@ package com.example.login_register.PickerView;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -113,11 +114,9 @@ public class SingleOptionsPicker<T> {
                     @Override
                     public void onOptionsSelect(int options1, int options2, int options3, View view) {
                         if (type == 1) {
-                            textView.setText(options1 + "岁");
+                            textView.setText(options1 + 60 + "CM");
                         } else if (type == 2) {
                             //注意起始数值
-                            textView.setText(options1 + 80 + "CM");
-                        } else if (type == 3) {
                             textView.setText(options1 + 30 + "KG");
                         }
                     }
@@ -132,6 +131,7 @@ public class SingleOptionsPicker<T> {
             pvOptions.show();
         }
     }
+
 
     /**
      * 关闭选择器

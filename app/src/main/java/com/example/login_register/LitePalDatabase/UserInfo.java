@@ -9,6 +9,19 @@ import java.util.List;
 public class UserInfo extends LitePalSupport {
 
     private int id;
+    private String Username;
+    private String PhoneNumber;
+    private String MailBox;
+    private String Password;
+    private double Height;
+    private double Weight;
+    private boolean Sex;
+    private int Age;
+    private String Birthday;
+    private String Location;
+    private int TargetStep;
+    private List<DailyRecord> DailyRecords = new ArrayList<DailyRecord>();
+
 
     public int getId() {
         return id;
@@ -17,21 +30,6 @@ public class UserInfo extends LitePalSupport {
     public void setId(int id) {
         this.id = id;
     }
-
-    private String Username;
-    private String PhoneNumber;
-    private String MailBox;
-    @Encrypt(algorithm = AES)
-    private String Password;
-    private double Height;
-    private double Weight;
-    private boolean Sex;
-    private int Age;
-    private String Birthday;
-    private String Location;
-    private List<DailyRecord> DailyRecords = new ArrayList<DailyRecord>();
-
-
 
     public String getUsername() {
         return Username;
@@ -119,5 +117,13 @@ public class UserInfo extends LitePalSupport {
 
     public void setLocation(String location) {
         Location = location;
+    }
+
+    public int getTargetStep() {
+        return TargetStep;
+    }
+
+    public void setTargetStep(int targetStep) {
+        TargetStep = targetStep;
     }
 }

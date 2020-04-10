@@ -2,6 +2,8 @@ package com.example.login_register.FloatView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +13,9 @@ import com.example.login_register.BLEActivity;
 import com.example.login_register.MainActivity;
 import com.example.login_register.R;
 import com.example.login_register.Service.FloatWindowService;
+import com.example.login_register.Utils.ActivityCollector;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class FloatWindowBigView extends LinearLayout {
     /**
@@ -30,7 +35,8 @@ public class FloatWindowBigView extends LinearLayout {
         viewWidth = view.getLayoutParams().width;
         viewHeight = view.getLayoutParams().height;
         Button close = findViewById(R.id.btn_close);
-        Button back = findViewById(R.id.btn_back);
+        final Button back = findViewById(R.id.btn_back);
+
         close.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -39,8 +45,15 @@ public class FloatWindowBigView extends LinearLayout {
                 MyWindowManager.removeSmallWindow(context);
                 Intent intent = new Intent(getContext(), FloatWindowService.class);
                 context.stopService(intent);
-                Intent intent2 = new Intent(getContext(), MainActivity.class);
+//                BLEActivity.mBluetoothGatt.disconnect();
+//                BLEActivity.mBluetoothGatt.close();
+//                ActivityCollector.finishAll();
+//                Bundle bundle = new Bundle();
+//                bundle.putString("data","back");
+                BLEActivity.data = 1;
+                Intent intent2 = new Intent(getContext(), BLEActivity.class);
                 context.startActivity(intent2);
+
             }
         });
         back.setOnClickListener(new OnClickListener() {

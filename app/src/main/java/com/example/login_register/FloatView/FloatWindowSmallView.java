@@ -8,6 +8,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.login_register.BLEActivity;
 import com.example.login_register.R;
 
 import java.lang.reflect.Field;
@@ -77,7 +78,8 @@ public class FloatWindowSmallView extends LinearLayout {
         viewWidth = view.getLayoutParams().width;
         viewHeight = view.getLayoutParams().height;
         TextView timeView = findViewById(R.id.time);
-        timeView.setText(MyWindowManager.getTime());
+        //timeView.setText(MyWindowManager.getTime());
+        timeView.setText(BLEActivity.dataBle);
     }
 
     @Override

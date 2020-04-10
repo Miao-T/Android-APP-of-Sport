@@ -10,6 +10,7 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
+import com.example.login_register.BLEActivity;
 import com.example.login_register.FloatView.MyWindowManager;
 
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class FloatWindowService extends Service {
      * 定时器，定时进行检测当前应该创建还是移除悬浮窗。
      */
     private Timer timer;
+
+//    public static int flag_back = 0;
 
     @Override
     public void onCreate() {
@@ -61,6 +64,7 @@ public class FloatWindowService extends Service {
         // Service被终止的同时也停止定时器继续运行
         timer.cancel();
         timer = null;
+//        flag_back = 1;
     }
 
     class RefreshTask extends TimerTask{

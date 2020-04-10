@@ -10,15 +10,19 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -33,6 +37,7 @@ import com.example.login_register.Adapter.BleAdapter;
 import com.example.login_register.LitePalDatabase.DailyRecord;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Service.FloatWindowService;
+import com.example.login_register.Utils.ActivityCollector;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.HexUtil;
 import com.example.login_register.Utils.ToastUtil;
@@ -51,109 +56,151 @@ import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
 public class BLEActivity extends BaseActivity {
 
     private static final String TAG = "ble_tag" ;
-    ProgressBar pbSearchBle;
-    ImageView ivSerBleStatus;
-    TextView tvSerBleStatus;
-    TextView tvSerBindStatus;
     ListView bleListView;
+    private Button mBtnUpdate;
+    private Button mBtnConnect;
+    private Button mBtnFloatBle;
     private LinearLayout operaView;
-    private Button btnWrite;
-    private Button btnRead;
-    private EditText etWriteContent;
-    private TextView tvResponse;
+    private LinearLayout searchView;
+    private TextView mTvResponse;
+    private TextView mTvNotFindBle;
     private List<BluetoothDevice> mDatas;
     private List<Integer> mRssis;
     private BleAdapter mAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothManager mBluetoothManager;
-    private boolean isScanning=false;
-    private boolean isConnecting=false;
-    private BluetoothGatt mBluetoothGatt;
+    public static BluetoothGatt mBluetoothGatt;
+    private BluetoothDevice mBluetoothDevice;
     //SharedPreferences
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
+    private String addressMAC;
+    private String remember_step;
     //服务和特征值
     private UUID notify_UUID_service;
     private UUID notify_UUID_chara;
-    private String AddressMAC;
-//    private UUID write_UUID_service;
-//    private UUID write_UUID_chara;
-//    private UUID read_UUID_service;
-//    private UUID read_UUID_chara;
-//    private UUID indicate_UUID_service;
-//    private UUID indicate_UUID_chara;
-//    private String hex="7B46363941373237323532443741397D";
 
+    //是否选择了List中的蓝牙设备
+    private boolean flag_item = false;
+    //判断是否点击了connect，否则闪退
+    private boolean flag_gatt= false;
+    //是否选择了记住密码
+    private boolean flag_rememberMac = false;
+    //自动连接时，是否找到相应蓝牙设备
+    private boolean flag_scan_succeed = false;
+
+    public static String dataBle;
+    private long mExitTime;
+    public static int data = 0;
+
+    static Handler handler = new Handler();
+    static Runnable runnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_device);
+        Log.d(TAG,"onCreate");
 
         LitePal.initialize(this);
         initView();
         initData();
+
         mBluetoothManager = (BluetoothManager)getSystemService(BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()){
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent,0);
         }
+        Log.d(TAG,String.valueOf(data));
+        if(mSharedPreferences.contains("MACAddress")){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    searchView.setVisibility(View.GONE);
+                    operaView.setVisibility(View.VISIBLE);
+                    mTvNotFindBle.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
+
+        if(data == 0){
+            remember_step = mSharedPreferences.getString("StepLastTime","");
+            mTvResponse.setText(remember_step);
+            checkPermissions();
+        }else if(data == 1 && mSharedPreferences.contains("MACAddress")){
+            mTvResponse.setText(dataBle);
+            //mBluetoothGatt.disconnect();
+            String RememberMAC = mSharedPreferences.getString("MACAddress","");
+            BluetoothDevice connectedDevice = mBluetoothAdapter.getRemoteDevice(RememberMAC);
+            connectBLE(connectedDevice);
+            data = 0;
+        }
     }
 
+
     private void initData(){
-        mDatas=new ArrayList<>();
-        mRssis=new ArrayList<>();
-        mAdapter=new BleAdapter(BLEActivity.this,mDatas,mRssis);
+        mDatas = new ArrayList<>();
+        mRssis = new ArrayList<>();
+        mAdapter = new BleAdapter(BLEActivity.this,mDatas,mRssis);
         bleListView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
     }
 
     private void initView(){
-        pbSearchBle=findViewById(R.id.progress_ser_bluetooth);
-        ivSerBleStatus=findViewById(R.id.iv_ser_ble_status);
-        tvSerBindStatus=findViewById(R.id.tv_ser_bind_status);
-        tvSerBleStatus=findViewById(R.id.tv_ser_ble_status);
-        bleListView=findViewById(R.id.ble_list_view);
-        operaView=findViewById(R.id.opera_view);
-        btnWrite=findViewById(R.id.btnWrite);
-        btnRead=findViewById(R.id.btnRead);
-        etWriteContent=findViewById(R.id.et_write);
-        tvResponse=findViewById(R.id.tv_response);
+        bleListView = findViewById(R.id.ble_list_view);
+        mBtnUpdate = findViewById(R.id.btn_update);
+        mBtnConnect = findViewById(R.id.btn_connect);
+        mBtnFloatBle = findViewById(R.id.btn_float_ble);
+        operaView = findViewById(R.id.opera_view);
+        searchView = findViewById(R.id.search_view);
+        mTvResponse = findViewById(R.id.tv_response);
+        mTvNotFindBle = findViewById(R.id.tv_not_find);
+        mTvNotFindBle.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
 
         mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
+        //the final step account
 
-        btnRead.setOnClickListener(new View.OnClickListener() {
+
+        mBtnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                //执行读取操作
-//                readData();
-                Intent intent = new Intent(BLEActivity.this,ForgetPsdActivity.class);
-                startActivity(intent);
+                BleAdapter.selectedPosition = -1;
+                mDatas.clear();
+                scanDevice();
             }
         });
 
-        btnWrite.setOnClickListener(new View.OnClickListener() {
+        mBtnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                //执行写入操作
-//                writeData();
-                Intent intent = new Intent(BLEActivity.this, FloatWindowService.class);
-                startService(intent);
-                finish();
-            }
-        });
+//                handler.removeCallbacks(runnable);
+//                mBluetoothAdapter.stopLeScan(scanCallback);
+                if(flag_item){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(BLEActivity.this);
+                    builder.setCancelable(false);
+                    builder.setTitle("蓝牙").setMessage("是否记住蓝牙，以便下次直接连接")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    flag_rememberMac = true;
+                                    connectBLE(mBluetoothDevice);
+                                }
+                            }).setNeutralButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            flag_rememberMac = false;
+                            mEditor.remove("MACAddress");
+                            mEditor.apply();
+                            connectBLE(mBluetoothDevice);
+                        }
+                    }).show();
 
-        ivSerBleStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isScanning){
-                    tvSerBindStatus.setText("停止搜索");
-                    stopScanDevice();
                 }else{
-                    checkPermissions();
+                    ToastUtil.showMsg(BLEActivity.this,"请先选择蓝牙设备");
                 }
+
             }
         });
 
@@ -163,51 +210,35 @@ public class BLEActivity extends BaseActivity {
         bleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                connectBLE(position);
-                AlertDialog.Builder builder = new AlertDialog.Builder(BLEActivity.this);
-                builder.setTitle("蓝牙").setMessage("是否记住蓝牙，以便下次直接连接")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mEditor.putString("MACAddress",AddressMAC);
-                                mEditor.apply();
-                            }
-                        }).setNeutralButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        AddressMAC = " ";
-                        mEditor.putString("MACAddress",AddressMAC);
-                        mEditor.apply();
-                    }
-                }).show();
+                mAdapter.selectedItemPosition(position);
+                mAdapter.notifyDataSetChanged();
+                mBluetoothDevice = mDatas.get(position);
+                flag_item = true;
+            }
+        });
+
+        mBtnFloatBle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BLEActivity.this,FloatWindowService.class);
+                startService(intent);
+                ActivityCollector.finishAll();
+
+//                Intent intent = new Intent(BLEActivity.this,LitePalActivity.class);
+//                startActivity(intent);
+            }
+        });
+
+        mTvNotFindBle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBluetoothGatt.disconnect();
+                mBluetoothGatt.close();
+                scanDevice();
             }
         });
     }
 
-    private void connectBLE(int pst){
-        if (isScanning){
-            stopScanDevice();
-        }
-        if (!isConnecting){
-            isConnecting = true;
-            BluetoothDevice bluetoothDevice = mDatas.get(pst);
-            //连接设备
-            tvSerBindStatus.setText("连接中");
-            Log.d(TAG,"连接"+pst);
-            AddressMAC = bluetoothDevice.getAddress();
-            Log.d(TAG,bluetoothDevice.getAddress());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                //6.0以上
-                mBluetoothGatt = bluetoothDevice.connectGatt(BLEActivity.this,
-                        true, gattCallback, TRANSPORT_LE);
-                //TRANSPORT_LE参数是设置传输层模式
-                //bluetoothDevice.connectGatt（）方法返回的对象BluetoothGatt,用于读写订阅操作
-            } else {
-                mBluetoothGatt = bluetoothDevice.connectGatt(BLEActivity.this,
-                        true, gattCallback);
-            }
-        }
-    }
 
     /**
      * 检查权限
@@ -229,41 +260,26 @@ public class BLEActivity extends BaseActivity {
                 });
     }
 
-    /**
-     * 开始扫描 10秒后自动停止
-     * */
-    private void scanDevice(){
-        tvSerBindStatus.setText("正在搜索");
-        isScanning = true;
-        pbSearchBle.setVisibility(View.VISIBLE);
-        //设置进度条可见
-        mBluetoothAdapter.startLeScan(scanCallback);
-        //startLeScan和stopLeScan必须有参数，开始结束扫描
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //结束扫描
-                mBluetoothAdapter.stopLeScan(scanCallback);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        isScanning = false;
-                        pbSearchBle.setVisibility(View.GONE);
-                        tvSerBindStatus.setText("搜索已结束");
-                    }
-                });
-            }
-        },5000);
-    }
 
     /**
-     * 停止扫描
+     * 开始扫描5秒后自动停止
      * */
-    private void stopScanDevice(){
-        isScanning=false;
-        pbSearchBle.setVisibility(View.GONE);
-        mBluetoothAdapter.stopLeScan(scanCallback);
+    private void scanDevice(){
+        Log.d(TAG,"scanDevice");
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                mBluetoothAdapter.stopLeScan(scanCallback);
+                Log.d(TAG,"5s");
+                if(!flag_scan_succeed){
+                    mTvNotFindBle.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+        mBluetoothAdapter.startLeScan(scanCallback);
+        handler.postDelayed(runnable,5000);
     }
+
 
     /**
      *扫描后显示设备
@@ -272,41 +288,53 @@ public class BLEActivity extends BaseActivity {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             String RememberMAC = mSharedPreferences.getString("MACAddress","");
-            Log.e(TAG, "run: scanning...");
-            Log.e(TAG,"SCANNING" + RememberMAC);
             if (!mDatas.contains(device)){
                 mDatas.add(device);
                 mRssis.add(rssi);
                 mAdapter.notifyDataSetChanged();
                 //notifyDataSetChanged()可以在修改适配器绑定的数组后，不用重新刷新Activity，通知Activity更新ListView
-            }
-                if(device.getAddress().equals(RememberMAC)){
-                    connectBLE(device);
+                for(BluetoothDevice mData:mDatas){
+                    if(mData.getAddress().equals(RememberMAC)){
+//                        handler.removeCallbacks(runnable);
+//                        mBluetoothAdapter.stopLeScan(scanCallback);
+                        flag_scan_succeed = true;
+                        connectBLE(mData);
+                        Log.d(TAG,"equal");
+                        break;
+                    }
                 }
+                Log.d(TAG, "run: scanning...");
+                Log.d(TAG,"SCANNING" + device.getAddress());
+            }
 
         }
     };
+
+
     private void connectBLE(BluetoothDevice bluetoothDevice){
-        if (isScanning){
-            stopScanDevice();
+        mTvNotFindBle.setVisibility(View.INVISIBLE);
+        handler.removeCallbacks(runnable);
+        mBluetoothAdapter.stopLeScan(scanCallback);
+        addressMAC = bluetoothDevice.getAddress();
+        if(flag_rememberMac){
+            mEditor.putString("MACAddress",addressMAC);
+            mEditor.apply();
         }
-        if (!isConnecting){
-            isConnecting = true;
-            //连接设备
-            tvSerBindStatus.setText("连接中");
-            Log.d(TAG,bluetoothDevice.getAddress());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                //6.0以上
-                mBluetoothGatt = bluetoothDevice.connectGatt(BLEActivity.this,
-                        true, gattCallback, TRANSPORT_LE);
-                //TRANSPORT_LE参数是设置传输层模式
-                //bluetoothDevice.connectGatt（）方法返回的对象BluetoothGatt,用于读写订阅操作
-            } else {
-                mBluetoothGatt = bluetoothDevice.connectGatt(BLEActivity.this,
-                        true, gattCallback);
-            }
+        Log.d(TAG,bluetoothDevice.getAddress());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //6.0以上
+            mBluetoothGatt = bluetoothDevice.connectGatt(BLEActivity.this,
+                    true, gattCallback, TRANSPORT_LE);
+            Log.d(TAG,gattCallback + "  is here?");
+            flag_gatt = true;
+            //TRANSPORT_LE参数是设置传输层模式
+            //bluetoothDevice.connectGatt（）方法返回的对象BluetoothGatt,用于读写订阅操作
+        } else {
+            mBluetoothGatt = bluetoothDevice.connectGatt(BLEActivity.this,
+                    true, gattCallback);
         }
     }
+
 
     private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         /**
@@ -315,22 +343,38 @@ public class BLEActivity extends BaseActivity {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
-            Log.e(TAG,"onConnectionStateChange()" + status + "  " + newState);
+            Log.d(TAG,"onConnectionStateChange()" + status + "  " + newState);
+            Log.d(TAG, String.valueOf( BluetoothGatt.STATE_DISCONNECTED));
             if (status == BluetoothGatt.GATT_SUCCESS){
                 //连接成功
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTvNotFindBle.setVisibility(View.INVISIBLE);
+                    }
+                });
                 if (newState == BluetoothGatt.STATE_CONNECTED){
-                    Log.e(TAG,"连接成功");
+                    Log.d(TAG,"连接成功");
                     //发现服务
                     gatt.discoverServices();
+                }else if(newState == BluetoothGatt.STATE_DISCONNECTED){
+                    Log.d(TAG,"STATE_DISCONNECTED");
+                    return;
                 }
             }else{
                 //连接失败
-                Log.e(TAG,"失败=="+status);
+                Log.d(TAG,"失败=="+status);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTvNotFindBle.setVisibility(View.VISIBLE);
+                    }
+                });
                 mBluetoothGatt.close();
                 //否则重复连接会报133连接失败
-                isConnecting = false;
             }
         }
+
         /**
          * 发现服务（真正建立连接）
          * */
@@ -338,8 +382,7 @@ public class BLEActivity extends BaseActivity {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
             //直到这里才是真正建立了可通信的连接
-            isConnecting = false;
-            Log.e(TAG,"onServicesDiscovered()---建立连接");
+            Log.d(TAG,"onServicesDiscovered()---建立连接"+status);
             //获取初始化服务和特征值
             //initServiceAndChara();
             //订阅通知
@@ -350,12 +393,17 @@ public class BLEActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    bleListView.setVisibility(View.GONE);
+                    searchView.setVisibility(View.GONE);
                     operaView.setVisibility(View.VISIBLE);
-                    tvSerBindStatus.setText("已连接");
+                    mTvNotFindBle.setVisibility(View.INVISIBLE);
                 }
             });
+            if(status != BluetoothGatt.GATT_SUCCESS){
+                Log.d(TAG,"unsucceed"+ status);
+                mTvNotFindBle.setVisibility(View.VISIBLE);
+            }
         }
+
 
         /**
          * 接收到硬件返回的数据
@@ -364,7 +412,7 @@ public class BLEActivity extends BaseActivity {
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
 //            Log.e(TAG,"onCharacteristicChanged()"+ HexUtil.encodeHexStr(characteristic.getValue()));
-            Log.e(TAG,"onCharacteristicChanged()"+ bytes2hex(characteristic.getValue()));
+            Log.d(TAG,"onCharacteristicChanged()"+ bytes2hex(characteristic.getValue()));
             final byte[] data = characteristic.getValue();
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
@@ -377,35 +425,19 @@ public class BLEActivity extends BaseActivity {
             dailyRecord.setUserInfo(userInfo);
             dailyRecord.save();
 
+            dataBle = bytes2hex(data);
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    tvResponse.setText(bytes2hex(data));
+                    mTvResponse.setText(dataBle);
 //                    addText(tvResponse,bytes2hex(data));
                 }
             });
 
         }
-
-        /**
-         * 读操作的回调
-         * */
-//        @Override
-//        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-//            super.onCharacteristicRead(gatt, characteristic, status);
-//            Log.e(TAG,"onCharacteristicRead()");
-//            //HexUtil.encodeHexStr(characteristic.getValue());
-//        }
-
-        /**
-         * 写操作的回调
-         * */
-//        @Override
-//        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-//            super.onCharacteristicWrite(gatt, characteristic, status);
-//            Log.e(TAG,"onCharacteristicWrite()  status="+status+",value="+ HexUtil.encodeHexStr(characteristic.getValue()));
-//        }
     };
+
 
     /**
      * 二进制转16进制ASCII码
@@ -424,111 +456,42 @@ public class BLEActivity extends BaseActivity {
         return sb.toString();
     }
 
+
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        BleAdapter.selectedPosition = -1;
+//        if(dataBle != null){
+//            mEditor.putString("StepLastTime",dataBle);
+//            mEditor.apply();
+//        }
+//        //if(flag_gatt){mBluetoothGatt.disconnect();}
+//    }
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mBluetoothGatt.disconnect();
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                //Object mHelperUtils;
+                ToastUtil.showMsg(BLEActivity.this,"再按一次退出APP");
+                //System.currentTimeMillis()系统当前时间
+                mExitTime = System.currentTimeMillis();
+            } else {
+                BleAdapter.selectedPosition = -1;
+                if(dataBle != null){
+                    mEditor.putString("StepLastTime",dataBle);
+                    mEditor.apply();
+                }
+//                if(flag_gatt){
+//                    mBluetoothGatt.disconnect();
+//                    mBluetoothGatt.close();
+//                }
+                data = 1;
+                ActivityCollector.finishAll();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
-
-    /**
-     * 获得蓝牙的UUID
-     * */
-//    private void initServiceAndChara(){
-//        List<BluetoothGattService> bluetoothGattServices= mBluetoothGatt.getServices();
-//        for (BluetoothGattService bluetoothGattService:bluetoothGattServices){
-//            List<BluetoothGattCharacteristic> characteristics=bluetoothGattService.getCharacteristics();
-//            for (BluetoothGattCharacteristic characteristic:characteristics){
-//                int charaProp = characteristic.getProperties();
-//                if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-//                    read_UUID_chara=characteristic.getUuid();
-//                    read_UUID_service=bluetoothGattService.getUuid();
-//                    Log.e(TAG,"read_chara="+read_UUID_chara+"----read_service="+read_UUID_service);
-//                }
-//                if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0) {
-//                    write_UUID_chara=characteristic.getUuid();
-//                    write_UUID_service=bluetoothGattService.getUuid();
-//                    Log.e(TAG,"write_chara="+write_UUID_chara+"----write_service="+write_UUID_service);
-//                }
-//                if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0) {
-//                    write_UUID_chara=characteristic.getUuid();
-//                    write_UUID_service=bluetoothGattService.getUuid();
-//                    Log.e(TAG,"write_chara_2="+write_UUID_chara+"----write_service_2="+write_UUID_service);
-//
-//                }
-//                if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-//                    notify_UUID_chara=characteristic.getUuid();
-//                    notify_UUID_service=bluetoothGattService.getUuid();
-//                    Log.e(TAG,"notify_chara="+notify_UUID_chara+"----notify_service="+notify_UUID_service);
-//                }
-//                if ((charaProp & BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
-//                    indicate_UUID_chara=characteristic.getUuid();
-//                    indicate_UUID_service=bluetoothGattService.getUuid();
-//                    Log.e(TAG,"indicate_chara="+indicate_UUID_chara+"----indicate_service="+indicate_UUID_service);
-//
-//                }
-//            }
-//        }
-//    }
-
-    /**
-     * 读取数据
-     * */
-//    private void readData() {
-//        BluetoothGattCharacteristic characteristic=mBluetoothGatt.getService(read_UUID_service)
-//                .getCharacteristic(read_UUID_chara);
-//        mBluetoothGatt.readCharacteristic(characteristic);
-//    }
-
-    /**
-     * 写人数据
-     * */
-//    private void writeData(){
-//        //write_UUID_service和write_UUID_chara是硬件工程师告诉我们的
-//        BluetoothGattService service = mBluetoothGatt.getService(write_UUID_service);
-//        BluetoothGattCharacteristic charaWrite = service.getCharacteristic(write_UUID_chara);
-//        byte[] data;
-//        String content = etWriteContent.getText().toString();
-//        if (!TextUtils.isEmpty(content)){
-//            data = HexUtil.hexStringToBytes(content);
-//        }else{
-//            data = HexUtil.hexStringToBytes(hex);
-//        }
-//        if (data.length>20){//数据大于个字节 分批次写入
-//            Log.e(TAG, "writeData: length="+data.length);
-//            int num = 0;
-//            if (data.length%20!=0){
-//                num = data.length/20+1;
-//            }else{
-//                num = data.length/20;
-//            }
-//            for (int i=0;i<num;i++){
-//                byte[] tempArr;
-//                if (i==num-1){
-//                    tempArr=new byte[data.length-i*20];
-//                    System.arraycopy(data,i*20,tempArr,0,data.length-i*20);
-//                }else{
-//                    tempArr=new byte[20];
-//                    System.arraycopy(data,i*20,tempArr,0,20);
-//                }
-//                charaWrite.setValue(tempArr);
-//                mBluetoothGatt.writeCharacteristic(charaWrite);
-//            }
-//        }else{
-//            charaWrite.setValue(data);
-//            mBluetoothGatt.writeCharacteristic(charaWrite);
-//        }
-//    }
-
-    /**
-     * 收到数据一列一列地显示
-     * */
-//    private void addText(TextView textView, String content) {
-//        textView.append(content);
-//        textView.append("\n");
-//        int offset = textView.getLineCount() * textView.getLineHeight();
-//        if (offset > textView.getHeight()) {
-//            textView.scrollTo(0, offset - textView.getHeight());
-//        }
-//    }
 }

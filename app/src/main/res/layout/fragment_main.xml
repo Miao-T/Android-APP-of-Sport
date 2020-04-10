@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:layout_marginTop="15dp">
+
+    <Button
+        android:id="@+id/btn_offline"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Force Offline"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/btn_BLE"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="BLE"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:layout_below="@id/btn_offline"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_Database"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="LitePal"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:layout_below="@id/btn_BLE"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_Float"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Start float window"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:layout_below="@id/btn_Database"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_Bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Bar"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:layout_below="@id/btn_Float"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_Picker"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Picker"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:layout_below="@id/btn_Bar"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_ali"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Ali"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:layout_below="@id/btn_Picker"
+        android:layout_marginTop="10dp"/>
+</RelativeLayout>

@@ -1,67 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="15dp"
     android:layout_marginTop="20dp">
 
-    <Button
-        android:id="@+id/btn_offline"
+    <FrameLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Force Offline"
-        android:textAllCaps="false"
-        android:textColor="@color/colorBlack"
-        android:textSize="20sp"/>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomBar" />
 
-    <Button
-        android:id="@+id/btn_BLE"
+    <com.roughike.bottombar.BottomBar
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="BLE"
-        android:textSize="20sp"
-        android:textAllCaps="false"
-        android:textColor="@color/colorBlack"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:id="@+id/btn_Database"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="LitePal"
-        android:textSize="20sp"
-        android:textAllCaps="false"
-        android:textColor="@color/colorBlack"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:id="@+id/btn_Float"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Start float window"
-        android:textSize="20sp"
-        android:textAllCaps="false"
-        android:textColor="@color/colorBlack"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:id="@+id/btn_Bar"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Bar"
-        android:textSize="20sp"
-        android:textAllCaps="false"
-        android:textColor="@color/colorBlack"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:id="@+id/btn_Picker"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Picker"
-        android:textSize="20sp"
-        android:textAllCaps="false"
-        android:textColor="@color/colorBlack"
-        android:layout_marginTop="20dp"/>
-</LinearLayout>
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        app:bb_tabXmlResource="@xml/bottombar_tabs"
+        app:bb_behavior="shifting"/>
+</RelativeLayout>

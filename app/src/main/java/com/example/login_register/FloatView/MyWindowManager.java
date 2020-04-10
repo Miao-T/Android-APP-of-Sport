@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.example.login_register.BLEActivity;
 import com.example.login_register.R;
 
 import java.text.SimpleDateFormat;
@@ -162,6 +163,7 @@ public class MyWindowManager {
         return mWindowManager;
     }
 
+
     /**
      * 更新小悬浮窗的TextView上的数据，显示时间
      *
@@ -171,9 +173,11 @@ public class MyWindowManager {
     public static void updateTime(Context context) {
         if (smallWindow != null) {
             TextView timeView = smallWindow.findViewById(R.id.time);
-            timeView.setText(getTime());
+            timeView.setText(BLEActivity.dataBle);
+
         }
     }
+
 
     public static String getTime(){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");

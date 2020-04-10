@@ -26,9 +26,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".WelcomeActivity"></activity>
+        <activity android:name=".UserInfoActivity"></activity>
+        <activity android:name=".AliSqlActivity" />
+        <activity android:name=".WelcomeActivity" />
         <activity android:name=".OptionPickerActivity" />
-        <activity android:name=".RegisterUserIfoActivity" />
         <activity android:name=".BarActivity" />
         <activity
             android:name="com.mob.tools.MobUIShell"
@@ -65,13 +66,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity">
+<!--             <intent-filter>-->
+<!--             <action android:name="android.intent.action.MAIN" />-->
 
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
+<!--             <category android:name="android.intent.category.LAUNCHER" />-->
+<!--             </intent-filter>-->
         </activity>
 
         <service android:name=".Service.FloatWindowService" />

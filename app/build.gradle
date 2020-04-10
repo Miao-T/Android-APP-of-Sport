@@ -39,11 +39,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation files('libs/libphonenumber-8.11.5.jar')
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
-    implementation "io.reactivex.rxjava2:rxjava:2.0.6"
-    implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
+    implementation 'io.reactivex.rxjava2:rxjava:2.0.6'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'org.litepal.android:java:3.0.0'
     implementation 'com.contrarywind:Android-PickerView:4.1.9'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.contrarywind:Android-PickerView:4.1.9'
     implementation 'com.google.code.gson:gson:2.7'
+    implementation files('libs/mysql-connector-java-5.1.46-bin.jar')
+    implementation 'com.roughike:bottom-bar:2.3.1'
 }

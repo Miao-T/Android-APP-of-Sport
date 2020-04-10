@@ -1,5 +1,6 @@
 package com.example.login_register;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,107 +12,122 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.example.login_register.Fragments.MainFragment;
+import com.example.login_register.Fragments.MineFragment;
 import com.example.login_register.Service.FloatWindowService;
+import com.example.login_register.Utils.ActivityCollector;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.DoubleClickToExitUtil;
 import com.example.login_register.Utils.ToastUtil;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabReselectListener;
+import com.roughike.bottombar.OnTabSelectListener;
 
 public class MainActivity extends BaseActivity {
 
-    private Button mBtnOffline;
-    private Button mBtnBLE;
-    private Button mBtnLitePal;
-    private Button mBtnFloat;
-    private Button mBtnBar;
-    private Button mBtnPicker;
+    private BottomBar mBottomBar;
     private long mExitTime;
-//    private SharedPreferences mSharedPreferences;
-//    private SharedPreferences.Editor mEditor;
+
+    private MainFragment mainFragment;
+    private MineFragment mineFragment;
+    private Fragment mCurrentFragment;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mBtnOffline = findViewById(R.id.btn_offline);
-        mBtnBLE = findViewById(R.id.btn_BLE);
-        mBtnLitePal = findViewById(R.id.btn_Database);
-        mBtnFloat = findViewById(R.id.btn_Float);
-        mBtnBar = findViewById(R.id.btn_Bar);
-        mBtnPicker = findViewById(R.id.btn_Picker);
-//        mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
-//        mEditor = mSharedPreferences.edit();
+        mainFragment = new MainFragment();
+        mineFragment = new MineFragment();
+        mBottomBar = findViewById(R.id.bottomBar);
 
-        mBtnOffline.setOnClickListener(new View.OnClickListener() {
+        mBottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent("com.example.login.FORCE_OFFLINE");
-//                mEditor.putBoolean("LoginBefore",false);
-//                mEditor.apply();
-                sendBroadcast(intent);
+            public void onTabSelected(int tabId) {
+                Object object = null;
+                switch (tabId){
+                    case R.id.tab1:
+                        object = mainFragment;
+                        ToastUtil.showMsg(MainActivity.this,"tag1");
+                        break;
+                    case R.id.tab2:
+                        object = mineFragment;
+                        ToastUtil.showMsg(MainActivity.this,"tag2");
+                        break;
+                    case R.id.tab3:
+                        ToastUtil.showMsg(MainActivity.this,"tag3");
+                        break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer,(Fragment)object).commit();
             }
         });
 
-        mBtnBLE.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,BLEActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mBtnLitePal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,LitePalActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mBtnFloat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,FloatWindowService.class);
-                startService(intent);
-                Log.d("Float","jump into float");
-                finish();
-            }
-        });
-
-        mBtnBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,BarActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mBtnPicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,RegisterUserIfoActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.contentContainer,fragment);
+        transaction.commit();
+    }
+
+    private void hideFragment(Fragment fragment){
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.contentContainer,fragment);
+        transaction.hide(fragment);
+    }
+
+    private void switchFragment(Fragment target){
+        if(mCurrentFragment == target)
+            return;
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if(mCurrentFragment != null){
+            transaction.hide(mCurrentFragment);
+        }
+        if(target.isAdded()){
+            transaction.show(target);
+        }else{
+            transaction.add(R.id.contentContainer,target,target.getClass().getName());
+        }
+        transaction.commit();
+        mCurrentFragment = target;
+    }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if ((System.currentTimeMillis() - mExitTime) > 2000) {
-                //Object mHelperUtils;
-                ToastUtil.showMsg(MainActivity.this,"再按一次退出APP");
-                //System.currentTimeMillis()系统当前时间
-                mExitTime = System.currentTimeMillis();
-            } else {
-                finish();
-            }
-            return true;
+    public void onBackPressed() {
+        if(mCurrentFragment != mainFragment){
+            mBottomBar.selectTabWithId(R.id.tab1);
+            return;
         }
-        return super.onKeyDown(keyCode, event);
+        moveTaskToBack(true);
+        super.onBackPressed();
     }
+
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+//                //Object mHelperUtils;
+//                ToastUtil.showMsg(MainActivity.this,"再按一次退出APP");
+//                //System.currentTimeMillis()系统当前时间
+//                mExitTime = System.currentTimeMillis();
+//            } else {
+//                ActivityCollector.finishAll();
+//            }
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 }

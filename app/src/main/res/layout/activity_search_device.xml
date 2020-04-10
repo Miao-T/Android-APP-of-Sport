@@ -5,101 +5,98 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <RelativeLayout
-        android:id="@+id/rl_bluetooth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:gravity="center_horizontal">
-
-        <RelativeLayout
-            android:id="@+id/layout_ser_ble"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_centerInParent="true"
-            android:background="@drawable/bg_ble_progress">
-
-            <ProgressBar
-                android:id="@+id/progress_ser_bluetooth"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:indeterminateDrawable="@drawable/rotate_progressbar"
-                android:visibility="invisible" />
-        </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/iv_ser_ble_status"
-            android:layout_width="103dp"
-            android:layout_height="76dp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/icon_ble_on" />
-
-        <TextView
-            android:id="@+id/tv_ser_ble_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="@string/shower_str12"
-            android:textColor="@color/light_blue"
-            android:textSize="15sp"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/tv_ser_bind_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:layout_below="@id/layout_ser_ble"
-            android:text="@string/shower_str5"
-            android:textColor="@color/light_blue"
-            android:layout_centerHorizontal="true"/>
-    </RelativeLayout>
-
-    <ListView
-        android:id="@+id/ble_list_view"
-        android:layout_below="@id/rl_bluetooth"
+    <LinearLayout
+        android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:divider="#cccccc"
-        android:dividerHeight="1px"/>
-
-    <LinearLayout
-        android:id="@+id/opera_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:visibility="gone"
-        android:layout_below="@id/rl_bluetooth"
         android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="20dp"
+            android:text="蓝牙连接"
+            android:textSize="25sp"
+            android:gravity="center_horizontal"/>
 
-        <Button
-            android:id="@+id/btnRead"
-            android:layout_width="wrap_content"
+        <ListView
+            android:id="@+id/ble_list_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="读数据" />
+            android:layout_marginTop="20dp"
+            android:divider="#cccccc"
+            android:dividerHeight="1px" />
 
         <LinearLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <EditText
-                android:id="@+id/et_write"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"/>
-            <Button
-                android:id="@+id/btnWrite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="写入数据"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
         </LinearLayout>
-        <TextView
-            android:id="@+id/tv_response"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="设备返回"/>
+            android:gravity="bottom"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_update"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:text="刷新"/>
+<!--            android:layout_marginLeft="30dp" -->
+
+            <Button
+                android:id="@+id/btn_connect"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:text="连接"/>
+<!--            android:layout_marginLeft="230dp"-->
+        </LinearLayout>
     </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/opera_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_response"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="  "
+                android:textSize="100dp"
+                android:gravity="center_horizontal"/>
+            <TextView
+                android:id="@+id/tv_not_find"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="请检查手环蓝牙和手机蓝牙是否正常，再点击刷新"
+                android:textSize="15sp"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="20dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:orientation="vertical">
+                <Button
+                    android:id="@+id/btn_float_ble"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Float Window"
+                    android:textAllCaps="false"/>
+            </LinearLayout>
+
+        </LinearLayout>
 
 </RelativeLayout>
