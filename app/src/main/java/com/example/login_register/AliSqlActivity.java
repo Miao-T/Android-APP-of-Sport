@@ -1,18 +1,24 @@
 package com.example.login_register;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Button;
 
 import com.example.login_register.CloudSQL.DBConnection;
 
+import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
+import com.example.login_register.Utils.ReadData;
+
+import java.util.EnumMap;
 
 public class AliSqlActivity extends BaseActivity{
     private EditText mEtId;
     private EditText mEtName;
-    private Button mBtnSave,mBtnRead,mBtnDelete,mBtnCreateTable;
+    private Button mBtnSave,mBtnDelete,mBtnUpdate,mBtnRead,mBtnCreateTable,mBtnDropTable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,9 +27,12 @@ public class AliSqlActivity extends BaseActivity{
         mEtId = findViewById(R.id.et_id_cloud);
         mEtName = findViewById(R.id.et_name_cloud);
         mBtnSave = findViewById(R.id.btn_save_cloud);
+        mBtnUpdate = findViewById(R.id.btn_update_cloud);
         mBtnRead = findViewById(R.id.btn_read_cloud);
         mBtnDelete = findViewById(R.id.btn_delete_cloud);
         mBtnCreateTable = findViewById(R.id.btn_createTable_cloud);
+        mBtnDropTable = findViewById(R.id.btn_dropTable_cloud);
+
 
         mBtnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -31,23 +40,13 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                 @Override
                     public void run() {
+                    DBConnection.DriverConnection();
                     String Name = mEtName.getText().toString();
                     int Id = Integer.parseInt(mEtId.getText().toString());
-                    DBConnection.linkInsert(Id,Name);
+                    DBConnection.InsertData(Id,Name);
+                    DBConnection.CreateTable(Name);
                 }
             }).start();
-            }
-        });
-
-        mBtnRead.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DBConnection.linkRead();
-                    }
-                }).start();
             }
         });
 
@@ -57,8 +56,45 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        DBConnection.DriverConnection();
                         String Name = mEtName.getText().toString();
-                        DBConnection.linkDelete(Name);
+                        int Id = Integer.parseInt(mEtId.getText().toString());
+                        DBConnection.DeleteData(Name);
+                    }
+                }).start();
+            }
+        });
+
+        mBtnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DBConnection.DriverConnection();
+                        String Name = mEtName.getText().toString();
+                        int Id = Integer.parseInt(mEtId.getText().toString());
+                        DBConnection.UpdateData(Name,Id);
+                    }
+                }).start();
+            }
+        });
+
+
+        mBtnRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DBConnection.DriverConnection();
+                        String Name = mEtName.getText().toString();
+                        ReadData readData = new DBConnection();
+                        EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(Name);
+                        userInfo.entrySet().iterator();
+                        String id = String.valueOf(userInfo.get(ReadData.UserInfoData.id));
+                        String registerTime = String.valueOf(userInfo.get(ReadData.UserInfoData.registerTime));
+                        Log.d("DB_tag",id + "  " + registerTime);
                     }
                 }).start();
             }
@@ -70,7 +106,21 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DBConnection.linkCreateTable();
+                        DBConnection.DriverConnection();
+                        //DBConnection.CreateTable();
+                    }
+                }).start();
+            }
+        });
+
+        mBtnDropTable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DBConnection.DriverConnection();
+                        DBConnection.DropTable();
                     }
                 }).start();
             }

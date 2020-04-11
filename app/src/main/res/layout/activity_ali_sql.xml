@@ -56,14 +56,6 @@
         android:textAllCaps="false"/>
 
     <Button
-        android:id="@+id/btn_read_cloud"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Read"
-        android:textAllCaps="false"
-        android:layout_marginTop="20dp"/>
-
-    <Button
         android:id="@+id/btn_delete_cloud"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -72,10 +64,34 @@
         android:layout_marginTop="20dp"/>
 
     <Button
+        android:id="@+id/btn_update_cloud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update"
+        android:textAllCaps="false"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/btn_read_cloud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Read"
+        android:textAllCaps="false"
+        android:layout_marginTop="20dp"/>
+
+    <Button
         android:id="@+id/btn_createTable_cloud"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="CreateTable"
+        android:textAllCaps="false"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/btn_dropTable_cloud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DropTable"
         android:textAllCaps="false"
         android:layout_marginTop="20dp"/>
 </LinearLayout>

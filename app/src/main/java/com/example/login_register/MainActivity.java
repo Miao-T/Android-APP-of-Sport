@@ -105,29 +105,23 @@ public class MainActivity extends BaseActivity {
         mCurrentFragment = target;
     }
 
-    @Override
-    public void onBackPressed() {
-        if(mCurrentFragment != mainFragment){
-            mBottomBar.selectTabWithId(R.id.tab1);
-            return;
-        }
-        moveTaskToBack(true);
-        super.onBackPressed();
-    }
-
 //    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if (keyCode == KeyEvent.KEYCODE_BACK) {
-//            if ((System.currentTimeMillis() - mExitTime) > 2000) {
-//                //Object mHelperUtils;
-//                ToastUtil.showMsg(MainActivity.this,"再按一次退出APP");
-//                //System.currentTimeMillis()系统当前时间
-//                mExitTime = System.currentTimeMillis();
-//            } else {
-//                ActivityCollector.finishAll();
-//            }
-//            return true;
+//    public void onBackPressed() {
+//        if(mCurrentFragment != mainFragment){
+//            mBottomBar.selectTabWithId(R.id.tab1);
+//            return;
 //        }
-//        return super.onKeyDown(keyCode, event);
+//        moveTaskToBack(true);
+//        super.onBackPressed();
 //    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.isLongPress()) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }
