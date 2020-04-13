@@ -1,45 +1,35 @@
 package com.example.login_register;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
-import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.login_register.Adapter.BleAdapter;
+import com.example.login_register.BLE.BleAdapter;
 import com.example.login_register.LitePalDatabase.DailyRecord;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Service.FloatWindowService;
 import com.example.login_register.Utils.ActivityCollector;
 import com.example.login_register.Utils.BaseActivity;
-import com.example.login_register.Utils.HexUtil;
 import com.example.login_register.Utils.ToastUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -306,7 +296,6 @@ public class BLEActivity extends BaseActivity {
                 Log.d(TAG, "run: scanning...");
                 Log.d(TAG,"SCANNING" + device.getAddress());
             }
-
         }
     };
 

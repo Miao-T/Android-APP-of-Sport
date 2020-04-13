@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterUserInfoActivity"
+    android:orientation="vertical"
+    android:layout_marginTop="20dp">
+    <RadioGroup
+        android:id="@+id/rg_sex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="性别："
+            android:textSize="25sp"
+            android:textColor="@color/colorBlack"/>
+        <RadioButton
+            android:id="@+id/rb_male"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="男"
+            android:textSize="25sp"
+            android:gravity="center_vertical"
+            android:layout_weight="1"/>
+        <RadioButton
+            android:id="@+id/rb_female"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="女"
+            android:textSize="25sp"
+            android:gravity="center_vertical"
+            android:layout_weight="1"/>
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/tv_height"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="#BBBBBB"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="点击选择身高" />
+
+    <TextView
+        android:id="@+id/tv_weight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="#BBBBBB"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="点击选择体重" />
+
+    <TextView
+        android:id="@+id/tv_birthday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="#BBBBBB"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="点击选择生日" />
+
+    <TextView
+        android:id="@+id/tv_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="#BBBBBB"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="点击选择居住地址" />
+
+    <TextView
+        android:id="@+id/tv_targetStep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="#BBBBBB"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="点击选择目标步数" />
+
+    <Button
+        android:id="@+id/btn_save_userInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="SAVE"
+        android:background="@drawable/buttom_clickable"/>
+
+    <TextView
+        android:id="@+id/tv_gap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跳过"
+        android:textSize="30sp"
+        android:textColor="@color/colorGrayDark"
+        android:gravity="center_horizontal"/>
+</LinearLayout>

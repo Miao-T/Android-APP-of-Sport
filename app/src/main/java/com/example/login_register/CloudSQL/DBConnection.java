@@ -25,6 +25,10 @@ public class DBConnection implements ReadData {
     private static final String userName = "root";
     private static final String password = "DidideMiao531";
 
+    private static boolean result;
+    /**
+     * 加载驱动
+    * */
     public static void DriverConnection(){
         try{
             Class.forName(driver).newInstance();
@@ -34,12 +38,17 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static void CreateTable(String tableName){
+    /**
+     * 注册后自动建表，表明为用户名
+    * */
+    public static void CreateTable(String name){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "CREATE TABLE "+tableName+"(time varchar(50) PRIMARY KEY,stepData varchar(50) NOT NULL)";
+            //time datetime PRIMARY KEY,
+            String tableName = "t" + name;
+            String sql = "CREATE TABLE "+tableName+"(id int AUTO_INCREMENT PRIMARY KEY,time datetime NOT NULL,stepData int(50) NOT NULL)";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -55,12 +64,16 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static void DropTable(){
+    /**
+     * 注销账号表
+    * */
+    public static void DropTable(String name){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "DROP TABLE didi";
+            String TableName = "t" + name;
+            String sql = "DROP TABLE "+TableName+"";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -76,14 +89,61 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static void InsertData(int id,String name){
+    public static void Drop(String name){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String TableName = name;
+            String sql = "DROP TABLE "+TableName+"";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void InsertData(){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
 //            String sql = "INSERT INTO userInfo(userId,userName) VALUES ('31116202','zgd')";
-            String sql = "INSERT INTO demo(id,name) VALUES ('"+id+"','"+name+"')";
-            //String sql = "INSERT INTO userInfo(userId,userName) VALUES ('"+Id+"','"+Name+"')";
+            String sql = "INSERT INTO t(time,stepData) VALUES ('2020-04-13 13:13:00','50')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    /**
+     * 注册账号
+    * */
+    public static void RegisterAccount(String name,String phoneNum,String email,String psd,String registerDate){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+//            String sql = "INSERT INTO userInfo(userId,userName) VALUES ('31116202','zgd')";
+            //String sql = "INSERT INTO demo(id,name) VALUES ('"+id+"','"+name+"')";
+            String sql = "INSERT INTO userInfo(userName,phoneNumber,email,password,registerDate) " +
+                    "VALUES ('"+name+"','"+phoneNum+"','"+email+"','"+psd+"','"+registerDate+"')";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -99,12 +159,17 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static void DeleteData(String name){
+    /**
+     * 录入用户信息
+    * */
+    public static void UpdateUserInfoByName(int sex,int height,double weight,String birthday,int age,String location,int targetStep,String name){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "DELETE FROM demo WHERE name = '"+name+"'";
+            String sql  = "UPDATE userInfo SET sex = '"+sex+"',height = '"+height+"',weight = '"+weight+"'," +
+                    "birthday = '"+birthday+"', age = '"+age+"',location = '"+location+"',targetStep = '"+targetStep+"'" +
+                    "WHERE userName = '"+name+"'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -120,12 +185,59 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static void UpdateData(String name,int id){
+    /**
+     * 注销账号信息
+    * */
+    public static void DeleteAccountData(String name){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "UPDATE demo SET id = '"+id+"' WHERE name = '"+name+"'";
+            //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
+            String sql = "DELETE FROM userInfo WHERE userName = '"+name+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void Delete(String name){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
+            String sql = "DELETE FROM userInfo WHERE userName = '"+name+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void UpdateData(){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String sql = "UPDATE userInfo SET birthday = '2020-5-11' WHERE userName = 'miaobeibei'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -142,20 +254,22 @@ public class DBConnection implements ReadData {
     }
 
     @Override
-    public EnumMap<UserInfoData, Object> ReadCloudData(String name) {
+    public EnumMap<UserInfoData, Object> ReadCloudData(String name,String phoneNum) {
         Connection connection = null;
         EnumMap<UserInfoData,Object> retMap = new EnumMap<UserInfoData, Object>(UserInfoData.class);
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "SELECT id,t FROM demo WHERE name = '"+name+"'";
+            String sql = "SELECT userId,userName,password FROM userInfo WHERE userName = '"+name+"'  OR phoneNumber = '"+phoneNum+"'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
-                String id = resultSet.getString("id");
-                Timestamp RegisterTime = resultSet.getTimestamp("t");
-                retMap.put(UserInfoData.id,id);
-                retMap.put(UserInfoData.registerTime,RegisterTime);
+                int userId = resultSet.getInt("userId");
+                String userName = resultSet.getString("userName");
+                String psd = resultSet.getString("password");
+                retMap.put(UserInfoData.userId,userId);
+                retMap.put(UserInfoData.password,psd);
+                retMap.put(UserInfoData.userName,userName);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -171,20 +285,26 @@ public class DBConnection implements ReadData {
         return retMap;
     }
 
-
-    public static void ReadData(String dataName, String name){
+    public static boolean CheckNameRegistered(String name){
         Connection connection = null;
-        String result;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "SELECT "+dataName+" FROM demo WHERE name = '"+name+"'";
+            String sql = "SELECT password FROM userInfo WHERE name = '"+name+"'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
-                result = resultSet.getString(""+dataName+"");
+                String psd = resultSet.getString("password");
                 //String Name = resultSet.getString("userName");
-                Log.d("DB_tag",result);
+                Log.d("DB_tag",psd);
+                if(psd.equals("null")){
+                    result = true;
+                    //无重名
+                }else{
+                    result = false;
+                    //已有
+                    break;
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -197,35 +317,7 @@ public class DBConnection implements ReadData {
                 }
             }
         }
+        return result;
     }
 
-
-
-    public static boolean VerifyData(String Name){
-        Connection connection = null;
-        try{
-            connection = DriverManager.getConnection(url,userName,password);
-            Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "SELECT id,t FROM demo WHERE name = '"+Name+"'";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()){
-                String Id = resultSet.getString("id");
-                Timestamp RegisterTime = resultSet.getTimestamp("t");
-                //String Name = resultSet.getString("userName");
-                Log.d("DB_tag",Id + " " + RegisterTime);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null){
-                try {
-                    connection.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-        return true;
-    }
 }

@@ -1,55 +1,67 @@
 package com.example.login_register;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Editable;
-import android.text.TextPaint;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.HidePsdUtil;
 import com.example.login_register.Utils.MD5Util;
+import com.example.login_register.Utils.ReadData;
 import com.example.login_register.Utils.ToastUtil;
 import com.google.i18n.phonenumbers.*;
 
 import org.litepal.LitePal;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.EnumMap;
 import java.util.List;
 
 public class RegisterActivity extends BaseActivity {
 
-    private EditText mUsername, mCountry, mPhoneNumber;
+    private EditText mUsername, mCountry, mPhoneNumber,mEmailAddress;
     private EditText mPassword1, mPassword2;
-    private TextView mUsernameText, mPhoneText, mPsdText, mPsdMatchText;
+    private TextView mUsernameText, mPhoneText, mEmailText, mPsdText, mPsdMatchText;
     private Button mConfirm, mBack;
     private CheckBox mPsdHide;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    private Boolean mUsernameResult, mPhoneResult, mPsdResult, mPsdMatchResult;
+    private Boolean mUsernameResult = false, mRepeatedResult = false, mPhoneResult = false, mPsdResult = false, mPsdMatchResult = false;
+    private String strName,registerDate;
 
-
+    /******************
+     检验邮箱有效性
+     ***********************/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DBConnection.DriverConnection();
+            }
+        }).start();
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date(System.currentTimeMillis());
+        registerDate = simpleDateFormat.format(date);
+
         initView();
+        mConfirm.setEnabled(false);
+        mConfirm.setClickable(false);
         LitePal.initialize(this);
         UsernameTextChangeListener();
         PhoneNumTextChangeListener();
@@ -57,56 +69,56 @@ public class RegisterActivity extends BaseActivity {
         Psd2TextChangeListener();
         HidePsdUtil.ShowOrHide(mPsdHide,mPassword1);
 
-//        mConfirm.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String username = mUsername.getText().toString();
-//                String phoneNumber = mPhoneNumber.getText().toString();
-//                String psd1 = mPassword1.getText().toString();
-//                String psd2 = mPassword2.getText().toString();
-//                // mPsdMatchResult = psdMatch(psd1,psd2);
-//
-//                if (mUsernameResult && mPhoneResult && mPsdResult && mPsdMatchResult) {
-//                    mEditor.putString("RegisterAccount", username);
-//                    mEditor.putString("RegisterTelephone", phoneNumber);
-//                    mEditor.putString("RegisterPsd", psd1);
-//                    mEditor.apply();
-//                    ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
-//                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-//                    startActivity(intent);
-//                } else {
-//                    mPassword1.setText("");
-//                    mPassword2.setText("");
-//                    mEditor.clear();
-//                    ToastUtil.showMsg(RegisterActivity.this, "账户注册有误");
-//                }
-//            }
-//        });
-
         mConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = mUsername.getText().toString().trim();
-                String phoneNumber = mPhoneNumber.getText().toString().trim();
-                String phoneCountry = mCountry.getText().toString().trim();
-                String psd1 = mPassword1.getText().toString().trim();
-                String psd2 = mPassword2.getText().toString().trim();
-                String psdMD5 = MD5Util.encrypt(psd1);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String username = mUsername.getText().toString().trim();
+                            String phoneNumber = mPhoneNumber.getText().toString().trim();
+                            String phoneCountry = mCountry.getText().toString().trim();
+                            String phoneNum = phoneCountry + phoneNumber;
 
-                if (mUsernameResult && mPhoneResult && mPsdResult && mPsdMatchResult) {
-                    UserInfo userInfo = new UserInfo();
-                    userInfo.setUsername(username);
-                    userInfo.setPassword(psdMD5);
-                    userInfo.setPhoneNumber(phoneCountry + phoneNumber);
-                    userInfo.save();
-                    ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
-                    Intent intent = new Intent(RegisterActivity.this, UserInfoActivity.class);
-                    startActivity(intent);
-                } else {
-                    mPassword1.setText("");
-                    mPassword2.setText("");
-                    ToastUtil.showMsg(RegisterActivity.this, "账户注册有误");
-                }
+                            ReadData readData = new DBConnection();
+                            EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(username,phoneNum);
+                            userInfo.entrySet().iterator();
+                            String psd = String.valueOf(userInfo.get(ReadData.UserInfoData.password));
+                            Log.d("DB_tag",psd);
+
+                            if(psd.equals("null")){
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        String username = mUsername.getText().toString().trim();
+                                        String phoneNumber = mPhoneNumber.getText().toString().trim();
+                                        String phoneCountry = mCountry.getText().toString().trim();
+                                        String phoneNum = phoneCountry + phoneNumber;
+                                        String emailAddress = mEmailAddress.getText().toString().trim();
+                                        String psd1 = mPassword1.getText().toString().trim();
+                                        String psd2 = mPassword2.getText().toString().trim();
+                                        String psdMD5 = MD5Util.encrypt(psd1);
+                                        DBConnection.RegisterAccount(username,phoneNum,emailAddress,psdMD5,registerDate);
+                                        DBConnection.CreateTable(username);
+                                        //恭喜您成为第N个用户
+                                    }
+                                }).start();
+                                ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
+                                Intent intent = new Intent(RegisterActivity.this, RegisterUserInfoActivity.class);
+                                intent.putExtra("RegisterName",username);
+                                startActivity(intent);
+                            }else{
+                                ToastUtil.showMsg(RegisterActivity.this, "用户名或手机号已被注册");
+                            }
+
+//                            UserInfo userInfo = new UserInfo();
+//                            userInfo.setUsername(username);
+//                            userInfo.setPassword(psdMD5);
+//                            userInfo.setPhoneNumber(phoneCountry + phoneNumber);
+//                            userInfo.save();
+                        }
+                    }).start();
+
             }
         });
 
@@ -123,6 +135,7 @@ public class RegisterActivity extends BaseActivity {
         mUsername = findViewById(R.id.et_username);
         mCountry = findViewById(R.id.et_country);
         mPhoneNumber = findViewById(R.id.et_telephone);
+        mEmailAddress = findViewById(R.id.et_email);
         mPassword1 = findViewById(R.id.et_psd1);
         mPassword2 = findViewById(R.id.et_psd2);
         mUsernameText = findViewById(R.id.name_Text);
@@ -151,13 +164,15 @@ public class RegisterActivity extends BaseActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 mUsernameResult = nameCheck(s.toString(), mUsernameText);
+                buttonEnable();
             }
         });
     }
 
-    public boolean nameUsed(String name) {
+    public boolean nameRegistered(String name) {
         List<UserInfo> userInfos = LitePal.findAll(UserInfo.class);
         boolean flag = true;
+
         for (UserInfo userInfo : userInfos) {
             if (name.equals(userInfo.getUsername())) {
                 flag = false;
@@ -168,27 +183,29 @@ public class RegisterActivity extends BaseActivity {
                 //未注册
             }
         }
+
         if(flag){
             return true;
             //未注册
         }else{
-            return false;
+            return true;
             //已注册
         }
     }
+
     public boolean nameCheck(String name, TextView nameText) {
         if (name.length() != 0) {
             String test = "^[a-zA-Z][a-zA-Z0-9_]{5,10}$";
-            boolean isUsed = nameUsed(name);
-            if (name.matches(test) && isUsed){
+            //boolean isUsed = nameRegistered(name);
+            if (name.matches(test)){
                 nameText.setText(R.string.username_ok);
                 nameText.setTextColor(getResources().getColor(R.color.colorBlack));
                 //用户名有效
                 return true;
-            } else if(!isUsed){
-                nameText.setText(R.string.username_has_been_registered);
-                nameText.setTextColor(getResources().getColor(R.color.colorAccent));
-                return false;
+//            } else if(!mRepeatedResult){
+//                nameText.setText(R.string.username_has_been_registered);
+//                nameText.setTextColor(getResources().getColor(R.color.colorAccent));
+//                return false;
             }else{
                 nameText.setText(R.string.username_invalid_warning);
                 nameText.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -223,6 +240,7 @@ public class RegisterActivity extends BaseActivity {
                     mPhoneText.setText(R.string.phone_invalid_warning);
                     mPhoneText.setTextColor(getResources().getColor(R.color.colorAccent));
                 }
+                buttonEnable();
             }
         });
     }
@@ -252,6 +270,7 @@ public class RegisterActivity extends BaseActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 mPsdResult = psdCheck(s.toString(), mPsdText);
+                buttonEnable();
             }
         });
     }
@@ -292,6 +311,7 @@ public class RegisterActivity extends BaseActivity {
             public void afterTextChanged(Editable s) {
                 String psd1Match = mPassword1.getText().toString();
                 mPsdMatchResult = psdMatch(psd1Match, s.toString(), mPsdMatchText);
+                buttonEnable();
             }
         });
     }
@@ -308,5 +328,13 @@ public class RegisterActivity extends BaseActivity {
         }
     }
 
-
+    private void buttonEnable(){
+        if (mUsernameResult && mPhoneResult && mPsdResult && mPsdMatchResult){
+            mConfirm.setEnabled(true);
+            mConfirm.setClickable(true);
+        }else{
+            mConfirm.setEnabled(false);
+            mConfirm.setClickable(false);
+        }
+    }
 }

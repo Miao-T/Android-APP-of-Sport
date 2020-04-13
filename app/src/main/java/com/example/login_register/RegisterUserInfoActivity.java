@@ -1,14 +1,15 @@
 package com.example.login_register;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
@@ -17,53 +18,109 @@ import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.bigkoo.pickerview.view.TimePickerView;
+import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.PickerView.JsonBean;
 import com.example.login_register.PickerView.SingleOptionsPicker;
 import com.example.login_register.Utils.AgeUtil;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.GetJsonDataUtil;
+import com.example.login_register.Utils.MonitorText;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.litepal.LitePal;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class UserInfoActivity extends BaseActivity implements View.OnClickListener{
+public class RegisterUserInfoActivity extends BaseActivity implements View.OnClickListener{
     private static final String TAG = "userInfo_tag";
-    private TextView mTvHeight,mTvWeight,mTvBirthday,mTvAddress;
+    private RadioGroup mRgSex;
+    private TextView mTvHeight,mTvWeight,mTvBirthday,mTvAddress,mTvStep;
     private Button mBtnSave;
+    private TextView mTvGap;
     private List<JsonBean> options1Items = new ArrayList<>();
     private ArrayList<ArrayList<String>> options2Items = new ArrayList<>();
     private ArrayList<ArrayList<ArrayList<String>>> options3Items = new ArrayList<>();
-    public int yearBirth,monthBirth,dayBirth;
-    public int yearNow,monthNow,dayNow;
-    public String birthday;
-    public int height,weight,age;
-    public String province,city,area,location;
-
-
+    private int yearBirth,monthBirth,dayBirth;
+    private int yearNow,monthNow,dayNow;
+    private String birthday;
+    private double weight;
+    private int sex,height,age,targetStep;
+    private String province,city,area,location;
+    private boolean flagSex = false,flagHeight = false,flagWeight = false,flagBirthday = false,flagLocation = false,flagStep = false;
+    private String name;
+    /**
+     * weight先点就有Bug
+    * */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_info);
+        setContentView(R.layout.activity_register_user_info);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DBConnection.DriverConnection();
+            }
+        }).start();
+
+        Intent intent = getIntent();
+        name = intent.getStringExtra("RegisterName");
+
         LitePal.initialize(this);
+        mRgSex = findViewById(R.id.rg_sex);
         mTvHeight = findViewById(R.id.tv_height);
         mTvWeight = findViewById(R.id.tv_weight);
         mTvBirthday = findViewById(R.id.tv_birthday);
         mTvAddress = findViewById(R.id.tv_address);
+        mTvStep = findViewById(R.id.tv_targetStep);
         mBtnSave = findViewById(R.id.btn_save_userInfo);
+        mTvGap = findViewById(R.id.tv_gap);
+        mBtnSave.setEnabled(false);
+        mBtnSave.setClickable(false);
+//        new MonitorText().SetMonitorText(mBtnSave,mTvHeight,mTvWeight,mTvBirthday,mTvAddress,mTvStep);
+
+        mRgSex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                flagSex = true;
+                RadioButton radioButton = group.findViewById(checkedId);
+                if(radioButton.getText().equals("男")){
+                    sex = 2;//male
+                }else{
+                    sex = 1;//female
+                }
+                if(flagSex && flagHeight && flagWeight && flagBirthday && flagLocation && flagStep){
+                    mBtnSave.setEnabled(true);
+                    mBtnSave.setClickable(true);
+                    Log.d(TAG,"click");
+                }else{
+                    mBtnSave.setEnabled(false);
+                    mBtnSave.setClickable(false);
+                    Log.d(TAG,"unclickable");
+                }
+            }
+        });
 
         mTvHeight.setOnClickListener(this);
         mTvWeight.setOnClickListener(this);
         mTvBirthday.setOnClickListener(this);
         mTvAddress.setOnClickListener(this);
+        mTvStep.setOnClickListener(this);
         mBtnSave.setOnClickListener(this);
+        mTvGap.setOnClickListener(this);
         initJsonData();
+
+        HeightWatcher();
+        WeightWatcher();
+        BirthdayWatcher();
+        LocationWatcher();
+        StepWatcher();
     }
 
     @Override
@@ -75,12 +132,10 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                     listHeight.add(i + "CM");
                 }
                 SingleOptionsPicker.openOptionsPicker(this, listHeight,1, mTvHeight);
-//                String height = mTvHeight.getText().toString();
-//                Log.d(TAG,height);
                 break;
             case R.id.tv_weight:
                 List<String> listWeight = new ArrayList<>();
-                for (int i = 30; i < 100; i++) {
+                for (double i = 30; i < 100; i = i +0.5) {
                     listWeight.add(i + "KG");
                 }
                 SingleOptionsPicker.openOptionsPicker(this, listWeight,2, mTvWeight);
@@ -91,36 +146,52 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
             case R.id.tv_address:
                 showPickerViewArea();
                 break;
+            case R.id.tv_targetStep:
+                List<String> listStep = new ArrayList<>();
+                for (int i = 1000; i < 40000; i=i+500) {
+                    listStep.add(i + "步");
+                }
+                SingleOptionsPicker.openOptionsPicker(this, listStep,3, mTvStep);
+                break;
             case R.id.btn_save_userInfo:
-                SaveToLitePal();
+                SaveToDatabase();
+                break;
+            case R.id.tv_gap:
+                Ignore();
                 break;
         }
     }
 
-    private void SaveToLitePal(){
-        String strHeight = mTvHeight.getText().toString();
-        height = Integer.parseInt(strHeight.substring(0,strHeight.length()-2));
-        String strWeight = mTvWeight.getText().toString();
-        weight = Integer.parseInt(strWeight.substring(0,strWeight.length()-2));
-        age = AgeUtil.getAge(yearNow,yearBirth,monthNow,monthBirth,dayNow,dayBirth);
+    private void SaveToDatabase(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DBConnection.UpdateUserInfoByName(sex,height,weight,birthday,age,location,targetStep,name);
+            }
+        }).start();
 
-        UserInfo userInfo = LitePal.findLast(UserInfo.class);
-        userInfo.setAge(age);
-        userInfo.setBirthday(birthday);
-        userInfo.setLocation(location);
-        userInfo.setHeight(height);
-        userInfo.setWeight(weight);
-        userInfo.save();
-
+//        UserInfo userInfo = LitePal.findLast(UserInfo.class);
+//        userInfo.setAge(age);
+//        userInfo.setBirthday(birthday);
+//        userInfo.setLocation(location);
+//        userInfo.setHeight(height);
+//        userInfo.setWeight(weight);
+//        userInfo.save();
+        Log.d(TAG,String.valueOf(sex));
         Log.d(TAG,String.valueOf(height));
         Log.d(TAG,String.valueOf(weight));
+        Log.d(TAG,String.valueOf(targetStep));
         Log.d(TAG,String.valueOf(age));
         Log.d(TAG,birthday);
         Log.d(TAG,location);
-        Intent intent = new Intent(UserInfoActivity.this,LoginActivity.class);
+        Intent intent = new Intent(RegisterUserInfoActivity.this,LoginActivity.class);
         startActivity(intent);
     }
 
+    private void Ignore(){
+        Intent intent = new Intent(RegisterUserInfoActivity.this,LoginActivity.class);
+        startActivity(intent);
+    }
 
     private void showPickerViewBirthday(){
         Calendar calender = Calendar.getInstance();//系统当前时间
@@ -135,9 +206,9 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 yearBirth = date.getYear() - 100 + 2000;
                 monthBirth = date.getMonth() + 1;
                 dayBirth = date.getDate();
-                birthday = yearBirth + "年 "
-                        + monthBirth + "月 "
-                        + dayBirth + "日";
+                birthday = String.valueOf(yearBirth) + "-"
+                        + String.valueOf(monthBirth) + "-"
+                        + String.valueOf(dayBirth);
                 mTvBirthday.setText(birthday);
 
             }
@@ -244,5 +315,119 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
             e.printStackTrace();
         }
         return detail;
+    }
+
+    private void HeightWatcher(){
+        mTvHeight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String strHeight = mTvHeight.getText().toString();
+                height = Integer.parseInt(strHeight.substring(0,strHeight.length()-2));
+                Log.d(TAG,strHeight);
+                flagHeight = true;
+                buttonEnable();
+            }
+        });
+    }
+
+    private void WeightWatcher() {
+        mTvWeight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String strWeight = mTvWeight.getText().toString();
+                weight = Double.parseDouble(strWeight.substring(0, strWeight.length() - 2));
+                Log.d(TAG, strWeight);
+                flagWeight = true;
+                buttonEnable();
+            }
+        });
+    }
+
+    private void BirthdayWatcher(){
+        mTvWeight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                age = AgeUtil.getAge(yearNow,yearBirth,monthNow,monthBirth,dayNow,dayBirth);
+                Log.d(TAG,birthday);
+                Log.d(TAG,"birthday");
+                flagBirthday = true;
+                buttonEnable();
+            }
+        });
+    }
+
+    private void LocationWatcher(){
+        mTvWeight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.d(TAG,location);
+                Log.d(TAG,"location");
+                flagLocation = true;
+                buttonEnable();
+            }
+        });
+    }
+
+    private void StepWatcher() {
+        mTvWeight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String strStep = mTvStep.getText().toString();
+                targetStep = Integer.parseInt(strStep.substring(0,strStep.length()-1));
+                Log.d(TAG, strStep);
+                flagStep = true;
+                buttonEnable();
+            }
+        });
+    }
+
+    private void buttonEnable(){
+        if(flagSex && flagHeight && flagWeight && flagBirthday && flagLocation && flagStep){
+            mBtnSave.setEnabled(true);
+            mBtnSave.setClickable(true);
+        }else{
+            mBtnSave.setEnabled(false);
+            mBtnSave.setClickable(false);
+        }
     }
 }

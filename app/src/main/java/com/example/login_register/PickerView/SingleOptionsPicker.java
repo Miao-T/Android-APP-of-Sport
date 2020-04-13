@@ -117,7 +117,9 @@ public class SingleOptionsPicker<T> {
                             textView.setText(options1 + 60 + "CM");
                         } else if (type == 2) {
                             //注意起始数值
-                            textView.setText(options1 + 30 + "KG");
+                            textView.setText(options1*0.5 + 30 + "KG");
+                        }else if(type == 3){
+                            textView.setText(options1*500 + 1000 + "步");
                         }
                     }
                 }).show();

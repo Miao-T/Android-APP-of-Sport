@@ -17,10 +17,9 @@ import com.example.login_register.AliSqlActivity;
 import com.example.login_register.BLEActivity;
 import com.example.login_register.BarActivity;
 import com.example.login_register.LitePalActivity;
-import com.example.login_register.MainActivity;
 import com.example.login_register.R;
 import com.example.login_register.Service.FloatWindowService;
-import com.example.login_register.UserInfoActivity;
+import com.example.login_register.RegisterUserInfoActivity;
 
 public class MainFragment extends Fragment{
     private Button mBtnOffline;
@@ -56,6 +55,7 @@ public class MainFragment extends Fragment{
             public void onClick(View v) {
                 Intent intent = new Intent("com.example.login.FORCE_OFFLINE");
                 LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+
                 //sendBroadcast(intent);
             }
         });
@@ -97,7 +97,7 @@ public class MainFragment extends Fragment{
         mBtnPicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+                Intent intent = new Intent(getActivity(), RegisterUserInfoActivity.class);
                 startActivity(intent);
             }
         });

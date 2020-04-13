@@ -1,5 +1,7 @@
 package com.example.login_register.Fragments;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,12 +14,29 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.login_register.AlterUserInfoActivity;
+import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.R;
+import com.example.login_register.SettingActivity;
+import com.example.login_register.Utils.ReadData;
 
-public class MineFragment extends Fragment {
-    private TextView mTvMine;
-    private Button mBtnMine;
-    private static final String TAG = "Fragment" ;
+import java.util.EnumMap;
+
+import static android.content.Context.MODE_PRIVATE;
+
+public class MineFragment extends Fragment implements View.OnClickListener {
+    private TextView mTvMine,mTvStep,mTvTotalDay;
+    private Button mBtnMyInfo,mBtnDeviceInfo,mBtnSetting,mBtnOffline;
+    private static final String TAG = "DB_tag" ;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private String loginName;
+    private int userId,sexInt,height,targetStep;
+    private double weight;
+    private String sex,registerTime,phoneNumber,birthday,location;
+
+    //fragment loginName,registerTime,targetStep
+    //alterActivity sex,height,weight,birthday,location
 
     @Nullable
     @Override
@@ -29,14 +48,67 @@ public class MineFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mTvMine = view.findViewById(R.id.tv_mine);
-        mBtnMine = view.findViewById(R.id.btn_mine);
-        Log.d(TAG,"mine onViewCreate");
-        mBtnMine.setOnClickListener(new View.OnClickListener() {
+        mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+        loginName = mSharedPreferences.getString("RememberName","");
+        Log.d(TAG,"fragment" + loginName);
+        new Thread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                mTvMine.setText("change");
+            public void run() {
+                DBConnection.DriverConnection();
+                ReadData readData = new DBConnection();
+                EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(loginName,"");
+                userInfo.entrySet().iterator();
+                registerTime = String.valueOf(userInfo.get(ReadData.UserInfoData.registerTime));
+                targetStep = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.targetStep)));
+
+                sexInt = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.sex)));
+                if(sexInt == 1){sex = "女";}else{sex = "男";}
+                height = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.height)));
+                weight = Double.parseDouble(String.valueOf(userInfo.get(ReadData.UserInfoData.weight)));
+                birthday = String.valueOf(userInfo.get(ReadData.UserInfoData.birthday));
+                location = String.valueOf(userInfo.get(ReadData.UserInfoData.location));
             }
-        });
+        }).start();
+
+
+        mTvMine = view.findViewById(R.id.tv_userName);
+        mTvStep = view.findViewById(R.id.tv_step);
+        mTvTotalDay = view.findViewById(R.id.tv_totalDay);
+        mBtnMyInfo = view.findViewById(R.id.btn_myInfo);
+        mBtnDeviceInfo = view.findViewById(R.id.btn_deviceInfo);
+        mBtnSetting = view.findViewById(R.id.btn_setting);
+        mBtnOffline = view.findViewById(R.id.btn_offline);
+
+        mBtnMyInfo.setOnClickListener(this);
+        mBtnDeviceInfo.setOnClickListener(this);
+        mBtnSetting.setOnClickListener(this);
+        mBtnOffline.setOnClickListener(this);
+        mTvMine.setText(loginName);
+        mTvTotalDay.setText("您已使用" + "i" + "天，达标" + "j" + "天");
+        mTvStep.setText("目标步数" + targetStep);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = null;
+        switch (v.getId()){
+            case R.id.btn_myInfo:
+                intent = new Intent(getActivity(), AlterUserInfoActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_deviceInfo:
+                break;
+            case  R.id.btn_setting:
+                intent = new Intent(getActivity(), SettingActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_offline:
+                intent = new Intent("com.example.login.FORCE_OFFLINE");
+                getActivity().sendBroadcast(intent);
+                mEditor.putBoolean("has_login",false);
+                mEditor.apply();
+                break;
+        }
     }
 }

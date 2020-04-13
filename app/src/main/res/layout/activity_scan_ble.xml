@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BLE.ScanBLEActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="20dp"
+        android:text="蓝牙连接"
+        android:textSize="25sp"
+        android:gravity="center_horizontal"/>
+
+    <ListView
+        android:id="@+id/ble_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:divider="#cccccc"
+        android:dividerHeight="1px" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_update"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:text="刷新"/>
+        <!--            android:layout_marginLeft="30dp" -->
+
+        <Button
+            android:id="@+id/btn_connect"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:text="连接"/>
+        <!--            android:layout_marginLeft="230dp"-->
+    </LinearLayout>
+</LinearLayout>

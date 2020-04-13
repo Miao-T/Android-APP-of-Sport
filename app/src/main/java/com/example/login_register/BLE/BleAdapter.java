@@ -1,4 +1,4 @@
-package com.example.login_register.Adapter;
+package com.example.login_register.BLE;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.login_register.BLEActivity;
 import com.example.login_register.R;
 
 import java.util.List;

@@ -3,16 +3,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
-        android:id="@+id/tv_mine"
+        android:id="@+id/tv_userName"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:text="我的"
+        android:text=""
         android:textSize="50sp"
         android:gravity="center"/>
 
-    <Button
-        android:id="@+id/btn_mine"
+    <TextView
+        android:id="@+id/tv_totalDay"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_below="@id/tv_mine"/>
+        android:layout_height="50dp"
+        android:text=""
+        android:textSize="30sp"
+        android:gravity="center"
+        android:layout_below="@id/tv_userName"/>
+
+    <TextView
+        android:id="@+id/tv_step"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text=""
+        android:textSize="30sp"
+        android:gravity="center"
+        android:layout_below="@id/tv_userName"/>
+
+    <Button
+        android:id="@+id/btn_myInfo"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:text="用户信息"
+        android:textSize="30sp"
+        android:layout_below="@id/tv_step"/>
+
+    <Button
+        android:id="@+id/btn_deviceInfo"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:text="设备信息"
+        android:textSize="30sp"
+        android:layout_below="@id/btn_myInfo"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_setting"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:text="设置"
+        android:textSize="30sp"
+        android:layout_below="@id/btn_deviceInfo"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_offline"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:text="退出账号"
+        android:textSize="30sp"
+        android:layout_below="@id/btn_setting"
+        android:layout_marginTop="120dp"/>
+
 </RelativeLayout>

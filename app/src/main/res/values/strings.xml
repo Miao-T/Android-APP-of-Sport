@@ -19,10 +19,9 @@
     <string name="phone_invalid_warning">× 手机号无效 ×</string>
     <string name="phone_ok">手机号有效</string>
 
-    <string name="shower_str11">其他方式绑定</string>
-    <string name="shower_str12">停止搜索</string>
-    <string name="shower_str4">搜索中</string>
-    <string name="shower_str5">未绑定</string>
-    <string name="shower_str6">搜索终止</string>
+    <string name="email_reminder">请输入有效邮箱地址</string>
+    <string name="email_invalid_warning">× 邮箱地址无效 ×</string>
+    <string name="email_ok">邮箱地址有效</string>
+
 
 </resources>

@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,14 +17,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
+import com.example.login_register.Utils.ReadData;
 import com.example.login_register.Utils.TimeCountUtil;
 import com.example.login_register.Utils.ToastUtil;
 
 import org.litepal.LitePal;
 
 import java.sql.Time;
+import java.util.EnumMap;
 import java.util.List;
 
 import cn.smssdk.EventHandler;
@@ -41,14 +45,25 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
     private TimeCountUtil mTimeCountUtil;
     private Boolean flag = true;
     private Boolean flagNumber = false;
-    private String phoneNumber,messageCode;
+    private String phoneNumber,messageCode,wholeNumber;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_message);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DBConnection.DriverConnection();
+            }
+        }).start();
         LitePal.initialize(this);
+        mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+
         if (Build.VERSION.SDK_INT >= 23) {
             String[] mPermissionList = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CALL_PHONE, Manifest.permission.READ_LOGS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.SET_DEBUG_APP, Manifest.permission.SYSTEM_ALERT_WINDOW, Manifest.permission.GET_ACCOUNTS, Manifest.permission.WRITE_APN_SETTINGS};
             ActivityCompat.requestPermissions(this, mPermissionList, 123);
@@ -86,8 +101,8 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
         switch (v.getId()){
             case R.id.btn_get_message:
                 phoneNumber = mEtAccount.getText().toString().trim();
-                Log.d(TAG,phoneNumber);
-                if(CheckPhoneNumber(phoneNumber)){
+                CheckPhoneNumber();
+                if(flagNumber){
                     mTimeCountUtil.start();
                     SMSSDK.getVerificationCode("86",phoneNumber);
                     mEtMessageMod.requestFocus();
@@ -112,22 +127,22 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
-    public boolean CheckPhoneNumber(String number){
-        String WholeNumber = "86" + number;
-        List<UserInfo> userInfos = LitePal.findAll(UserInfo.class);
-        for (UserInfo userInfo : userInfos) {
-            if (WholeNumber.equals(userInfo.getPhoneNumber())) {
-                flagNumber = true;
-                break;
-            }else{
-                flagNumber = false;
+    public void CheckPhoneNumber(){
+        wholeNumber = "86" + phoneNumber;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ReadData readData = new DBConnection();
+                EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData("",wholeNumber);
+                userInfo.entrySet().iterator();
+                String psdCloud = String.valueOf(userInfo.get(ReadData.UserInfoData.password));
+                if(psdCloud.equals("null")){
+                    flagNumber = false;
+                }else{
+                    flagNumber = true;
+                }
             }
-        }
-        if(flagNumber){
-            return true;
-        }else{
-            return false;
-        }
+        }).start();
     }
 
     @Override
@@ -136,7 +151,7 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
         SMSSDK.unregisterEventHandler(eventHandler);
     }
 
-    Handler handler = new Handler(){
+     Handler handler = new Handler(){
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -155,6 +170,18 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
             }
             if(result == SMSSDK.RESULT_COMPLETE){
                 if(event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE){
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ReadData readData = new DBConnection();
+                            EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData("",wholeNumber);
+                            userInfo.entrySet().iterator();
+                            String userName = String.valueOf(userInfo.get(ReadData.UserInfoData.userName));
+                            mEditor.putString("RememberName",userName);
+                            mEditor.putBoolean("has_login",true);
+                            mEditor.apply();
+                        }
+                    }).start();
                     ToastUtil.showMsg(LoginMessageActivity.this,"验证码输入正确");
                     Intent intent = new Intent(LoginMessageActivity.this,MainActivity.class);
                     startActivity(intent);
@@ -174,6 +201,4 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
         }
 
     };
-
-
 }

@@ -33,19 +33,36 @@ import com.roughike.bottombar.OnTabSelectListener;
 
 public class MainActivity extends BaseActivity {
 
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private static final String TAG = "DB_tag";
     private BottomBar mBottomBar;
     private long mExitTime;
-
     private MainFragment mainFragment;
     private MineFragment mineFragment;
     private Fragment mCurrentFragment;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+        String LoginName = mSharedPreferences.getString("RememberName","");
+        Log.d(TAG,"activity" + LoginName);
+
+        /**
+         * activity-fragment传数据
+        * */
+//        Bundle bundle = new Bundle();
+//        bundle.putString("LoginName", LoginName);
+//        //首先有一个Fragment对象 调用这个对象的setArguments(bundle)传递数据
+//        mineFragment.setArguments(bundle);
+
+        //        Bundle bundle = getArguments();
+//        LoginName = bundle.getString("LoginName");
+//        Log.d(TAG,"fragment" + LoginName);
 
         mainFragment = new MainFragment();
         mineFragment = new MineFragment();
