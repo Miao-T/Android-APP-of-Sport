@@ -1,6 +1,7 @@
 package com.example.login_register.Fragments;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,8 @@ import com.example.login_register.R;
 import com.example.login_register.Service.FloatWindowService;
 import com.example.login_register.RegisterUserInfoActivity;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class MainFragment extends Fragment{
     private Button mBtnOffline;
     private Button mBtnBLE;
@@ -30,6 +33,8 @@ public class MainFragment extends Fragment{
     private Button mBtnPicker;
     private Button mBtnAli;
     private static final String TAG = "Fragment" ;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
     @Nullable
     @Override
@@ -53,9 +58,14 @@ public class MainFragment extends Fragment{
         mBtnOffline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent("com.example.login.FORCE_OFFLINE");
-                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-
+                mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
+                mEditor = mSharedPreferences.edit();
+                mEditor.remove("RememberName");
+                mEditor.remove("has_login");
+                mEditor.remove("DeviceMac");
+                mEditor.remove("is_remember");
+                mEditor.remove("RememberPsd");
+                mEditor.apply();
                 //sendBroadcast(intent);
             }
         });

@@ -278,6 +278,8 @@ public class BLEActivity extends BaseActivity {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             String RememberMAC = mSharedPreferences.getString("MACAddress","");
+            Log.d(TAG, "run: scanning...");
+            Log.d(TAG,"SCANNING" + device.getAddress());
             if (!mDatas.contains(device)){
                 mDatas.add(device);
                 mRssis.add(rssi);

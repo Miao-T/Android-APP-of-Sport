@@ -10,6 +10,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.example.login_register.BLEActivity;
+import com.example.login_register.MainActivity;
 import com.example.login_register.R;
 
 import java.text.SimpleDateFormat;
@@ -173,7 +174,7 @@ public class MyWindowManager {
     public static void updateTime(Context context) {
         if (smallWindow != null) {
             TextView timeView = smallWindow.findViewById(R.id.time);
-            timeView.setText(BLEActivity.dataBle);
+            timeView.setText(MainActivity.dataBle);
 
         }
     }

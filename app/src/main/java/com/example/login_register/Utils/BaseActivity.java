@@ -5,17 +5,22 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.login_register.Broadcast.BroadcastNetworkActivity;
 import com.example.login_register.LoginActivity;
 
 public class BaseActivity extends AppCompatActivity {
-    private ForceOfflineReceiver receiver;
-
+    private ForceOfflineReceiver forceOfflineReceiver;
+    //private NetWorkChangeReceiver netWorkChangeReceiver;
+    //public static boolean networkOk;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,10 +30,14 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.example.login.FORCE_OFFLINE");
-        receiver = new ForceOfflineReceiver();
-        registerReceiver(receiver,intentFilter);
+        IntentFilter intentFilter1 = new IntentFilter();
+        //IntentFilter intentFilter2 = new IntentFilter();
+        intentFilter1.addAction("com.example.login.FORCE_OFFLINE");
+        //intentFilter2.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        forceOfflineReceiver = new ForceOfflineReceiver();
+        //netWorkChangeReceiver = new NetWorkChangeReceiver();
+        registerReceiver(forceOfflineReceiver,intentFilter1);
+        //registerReceiver(netWorkChangeReceiver,intentFilter2);
     }
 
     @Override
@@ -40,7 +49,8 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ActivityCollector.removeActivity(this);
-        unregisterReceiver(receiver);
+        unregisterReceiver(forceOfflineReceiver);
+        //unregisterReceiver(netWorkChangeReceiver);
     }
 
     class ForceOfflineReceiver extends BroadcastReceiver{
@@ -62,4 +72,30 @@ public class BaseActivity extends AppCompatActivity {
             builder.show();
         }
     }
+
+//    class NetWorkChangeReceiver extends BroadcastReceiver{
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+//            final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+//            if(networkInfo != null && networkInfo.isAvailable()){
+//                networkOk = true;
+//                ToastUtil.showMsg(context,"移动数据已打开");
+////                ToastUtil.showMsg(BroadcastNetworkActivity.this,"network is available");
+//            }else {
+//                networkOk = false;
+//                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//                builder.setTitle("Warning");
+//                builder.setMessage("移动数据已关闭，请先打开移动数据");
+//                builder.setCancelable(false);
+//                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                    }
+//                });
+//                builder.show();
+////                ToastUtil.showMsg(BroadcastNetworkActivity.this,"network is unavailable");
+//            }
+//        }
+//    }
 }

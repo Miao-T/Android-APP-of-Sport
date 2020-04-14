@@ -1,5 +1,6 @@
 package com.example.login_register;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,11 +13,16 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.login_register.BLE.ScanBLEActivity;
 import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.HidePsdUtil;
 import com.example.login_register.Utils.MD5Util;
+import com.example.login_register.Utils.NetworkListener;
 import com.example.login_register.Utils.ReadData;
 import com.example.login_register.Utils.ToastUtil;
 import com.google.i18n.phonenumbers.*;
@@ -28,7 +34,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.List;
 
-public class RegisterActivity extends BaseActivity {
+public class RegisterActivity extends BaseActivity implements View.OnClickListener{
 
     private EditText mUsername, mCountry, mPhoneNumber,mEmailAddress;
     private EditText mPassword1, mPassword2;
@@ -37,8 +43,11 @@ public class RegisterActivity extends BaseActivity {
     private CheckBox mPsdHide;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    private Boolean mUsernameResult = false, mRepeatedResult = false, mPhoneResult = false, mPsdResult = false, mPsdMatchResult = false;
+    private boolean mUsernameResult = false, mPhoneResult = false, mPsdResult = false, mPsdMatchResult = false;
+    private boolean mNetworkResult = false, mRepeatedResult = false;
     private String strName,registerDate;
+    private NetworkListener networkListener;
+
 
     /******************
      检验邮箱有效性
@@ -54,7 +63,6 @@ public class RegisterActivity extends BaseActivity {
                 DBConnection.DriverConnection();
             }
         }).start();
-
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date(System.currentTimeMillis());
         registerDate = simpleDateFormat.format(date);
@@ -63,72 +71,33 @@ public class RegisterActivity extends BaseActivity {
         mConfirm.setEnabled(false);
         mConfirm.setClickable(false);
         LitePal.initialize(this);
+        TextListener();
+        HidePsdUtil.ShowOrHide(mPsdHide,mPassword1);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.btn_confirm:
+                mNetworkResult = networkListener.NetWorkState(RegisterActivity.this);
+                if(mNetworkResult){
+                    UpdateAccount();
+                }else{
+                    ToastUtil.showMsg(RegisterActivity.this,"请先打开移动数据，不然无法注册");
+                }
+                break;
+            case R.id.btn_back:
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+                break;
+        }
+    }
+
+    private void TextListener(){
         UsernameTextChangeListener();
         PhoneNumTextChangeListener();
         Psd1TextChangeListener();
         Psd2TextChangeListener();
-        HidePsdUtil.ShowOrHide(mPsdHide,mPassword1);
-
-        mConfirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            String username = mUsername.getText().toString().trim();
-                            String phoneNumber = mPhoneNumber.getText().toString().trim();
-                            String phoneCountry = mCountry.getText().toString().trim();
-                            String phoneNum = phoneCountry + phoneNumber;
-
-                            ReadData readData = new DBConnection();
-                            EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(username,phoneNum);
-                            userInfo.entrySet().iterator();
-                            String psd = String.valueOf(userInfo.get(ReadData.UserInfoData.password));
-                            Log.d("DB_tag",psd);
-
-                            if(psd.equals("null")){
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        String username = mUsername.getText().toString().trim();
-                                        String phoneNumber = mPhoneNumber.getText().toString().trim();
-                                        String phoneCountry = mCountry.getText().toString().trim();
-                                        String phoneNum = phoneCountry + phoneNumber;
-                                        String emailAddress = mEmailAddress.getText().toString().trim();
-                                        String psd1 = mPassword1.getText().toString().trim();
-                                        String psd2 = mPassword2.getText().toString().trim();
-                                        String psdMD5 = MD5Util.encrypt(psd1);
-                                        DBConnection.RegisterAccount(username,phoneNum,emailAddress,psdMD5,registerDate);
-                                        DBConnection.CreateTable(username);
-                                        //恭喜您成为第N个用户
-                                    }
-                                }).start();
-                                ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
-                                Intent intent = new Intent(RegisterActivity.this, RegisterUserInfoActivity.class);
-                                intent.putExtra("RegisterName",username);
-                                startActivity(intent);
-                            }else{
-                                ToastUtil.showMsg(RegisterActivity.this, "用户名或手机号已被注册");
-                            }
-
-//                            UserInfo userInfo = new UserInfo();
-//                            userInfo.setUsername(username);
-//                            userInfo.setPassword(psdMD5);
-//                            userInfo.setPhoneNumber(phoneCountry + phoneNumber);
-//                            userInfo.save();
-                        }
-                    }).start();
-
-            }
-        });
-
-        mBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private void initView(){
@@ -149,6 +118,54 @@ public class RegisterActivity extends BaseActivity {
         // mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
+
+        networkListener = new NetworkListener();
+
+        mConfirm.setOnClickListener(this);
+        mBack.setOnClickListener(this);
+    }
+
+    private void UpdateAccount(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String username = mUsername.getText().toString().trim();
+                String phoneNumber = mPhoneNumber.getText().toString().trim();
+                String phoneCountry = mCountry.getText().toString().trim();
+                String phoneNum = phoneCountry + phoneNumber;
+
+                ReadData readData = new DBConnection();
+                EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(username,phoneNum);
+                userInfo.entrySet().iterator();
+                String psd = String.valueOf(userInfo.get(ReadData.UserInfoData.password));
+                Log.d("DB_tag",psd);
+
+                if(psd.equals("null")){
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String username = mUsername.getText().toString().trim();
+                            String phoneNumber = mPhoneNumber.getText().toString().trim();
+                            String phoneCountry = mCountry.getText().toString().trim();
+                            String phoneNum = phoneCountry + phoneNumber;
+                            String emailAddress = mEmailAddress.getText().toString().trim();
+                            String psd1 = mPassword1.getText().toString().trim();
+                            String psd2 = mPassword2.getText().toString().trim();
+                            String psdMD5 = MD5Util.encrypt(psd1);
+                            DBConnection.RegisterAccount(username,phoneNum,emailAddress,psdMD5,registerDate);
+                            DBConnection.CreateTable(username);
+                            //恭喜您成为第N个用户
+                        }
+                    }).start();
+                    ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
+                    Intent intent = new Intent(RegisterActivity.this, RegisterUserInfoActivity.class);
+                    intent.putExtra("RegisterName",username);
+                    startActivity(intent);
+                }else{
+                    ToastUtil.showMsg(RegisterActivity.this, "用户名或手机号已被注册");
+                }
+            }
+        }).start();
     }
 
     public void UsernameTextChangeListener(){

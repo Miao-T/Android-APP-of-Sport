@@ -14,10 +14,12 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.login_register.BLE.ScanBLEActivity;
 import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.MD5Util;
+import com.example.login_register.Utils.NetworkListener;
 import com.example.login_register.Utils.ReadData;
 import com.example.login_register.Utils.ToastUtil;
 
@@ -38,6 +40,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private SharedPreferences.Editor mEditor;
     private TextView mTvMessage;
     private String psdCloud,psdInput,psdMD5Input;
+    private NetworkListener networkListener;
+    private boolean mNetworkResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +65,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_login:
-                login();
+                mNetworkResult = networkListener.NetWorkState(LoginActivity.this);
+                if(mNetworkResult){
+                    login();
+                }else{
+                    ToastUtil.showMsg(LoginActivity.this,"请先打开移动数据，不然无法登录");
+                }
+
                 break;
             case R.id.btn_register:
                 Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
@@ -93,6 +103,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         mBtnLogin.setOnClickListener(this);
         mBtnRegister.setOnClickListener(this);
         mTvMessage.setOnClickListener(this);
+
+        networkListener = new NetworkListener();
     }
 
 
@@ -100,7 +112,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         boolean is_remember = mSharedPreferences.getBoolean("is_remember",false);
         if(is_remember){
             String username = mSharedPreferences.getString("RememberName","");
-            String password = mSharedPreferences.getString("RememberPsd","");
+            String password = mSharedPreferences.getString("RememberPsd",null);
             mEtName.setText(username);
             mEtPassword.setText(password);
             mCbRememberPsd.setChecked(true);
@@ -109,17 +121,46 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     private void auto_login(){
         boolean has_login = mSharedPreferences.getBoolean("has_login",false);
+        String RememberDevice = mSharedPreferences.getString("DeviceMac","");
+        String FlagDevice = "flag" + RememberDevice;
+        Log.d("DB_tag","flag"+ RememberDevice);
         if(has_login){
-            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-            startActivity(intent);
-            Handler handler = new Handler();
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    LoginActivity.this.finish();
-                }
-            };
-            handler.postDelayed(runnable,2000);
+            if(FlagDevice.equals("flag")){
+                Log.d("DB_tag",RememberDevice);
+                Intent intent = new Intent(LoginActivity.this, ScanBLEActivity.class);
+                startActivity(intent);
+                Handler handler = new Handler();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        LoginActivity.this.finish();
+                    }
+                };
+                handler.postDelayed(runnable,2000);
+            }else{
+                Log.d("DB_tag",RememberDevice);
+                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+                startActivity(intent);
+                Handler handler = new Handler();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        LoginActivity.this.finish();
+                    }
+                };
+                handler.postDelayed(runnable,2000);
+            }
+
+//            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+//            startActivity(intent);
+//            Handler handler = new Handler();
+//            Runnable runnable = new Runnable() {
+//                @Override
+//                public void run() {
+//                    LoginActivity.this.finish();
+//                }
+//            };
+//            handler.postDelayed(runnable,2000);
         }
     }
 
@@ -158,7 +199,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         mEditor.putString("RememberName",nameInput);
                         mEditor.putBoolean("has_login",true);
                         mEditor.apply();
-                        Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+                        Intent intent = new Intent(LoginActivity.this,ScanBLEActivity.class);
                         startActivity(intent);
                         finish();
                     }else{

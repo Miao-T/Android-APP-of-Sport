@@ -24,4 +24,6 @@ public class ActivityCollector {
         }
         activities.clear();
     }
+
+
 }

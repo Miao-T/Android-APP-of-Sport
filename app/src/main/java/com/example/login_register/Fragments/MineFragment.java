@@ -52,24 +52,25 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mEditor = mSharedPreferences.edit();
         loginName = mSharedPreferences.getString("RememberName","");
         Log.d(TAG,"fragment" + loginName);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                DBConnection.DriverConnection();
-                ReadData readData = new DBConnection();
-                EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(loginName,"");
-                userInfo.entrySet().iterator();
-                registerTime = String.valueOf(userInfo.get(ReadData.UserInfoData.registerTime));
-                targetStep = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.targetStep)));
 
-                sexInt = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.sex)));
-                if(sexInt == 1){sex = "女";}else{sex = "男";}
-                height = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.height)));
-                weight = Double.parseDouble(String.valueOf(userInfo.get(ReadData.UserInfoData.weight)));
-                birthday = String.valueOf(userInfo.get(ReadData.UserInfoData.birthday));
-                location = String.valueOf(userInfo.get(ReadData.UserInfoData.location));
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                DBConnection.DriverConnection();
+//                ReadData readData = new DBConnection();
+//                EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(loginName,"");
+//                userInfo.entrySet().iterator();
+//                registerTime = String.valueOf(userInfo.get(ReadData.UserInfoData.registerTime));
+//                targetStep = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.targetStep)));
+//
+//                sexInt = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.sex)));
+//                if(sexInt == 1){sex = "女";}else{sex = "男";}
+//                height = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.height)));
+//                weight = Double.parseDouble(String.valueOf(userInfo.get(ReadData.UserInfoData.weight)));
+//                birthday = String.valueOf(userInfo.get(ReadData.UserInfoData.birthday));
+//                location = String.valueOf(userInfo.get(ReadData.UserInfoData.location));
+//            }
+//        }).start();
 
 
         mTvMine = view.findViewById(R.id.tv_userName);
@@ -84,9 +85,10 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mBtnDeviceInfo.setOnClickListener(this);
         mBtnSetting.setOnClickListener(this);
         mBtnOffline.setOnClickListener(this);
-        mTvMine.setText(loginName);
-        mTvTotalDay.setText("您已使用" + "i" + "天，达标" + "j" + "天");
-        mTvStep.setText("目标步数" + targetStep);
+
+//        mTvMine.setText(loginName);
+//        mTvTotalDay.setText("您已使用" + "i" + "天，达标" + "j" + "天");
+//        mTvStep.setText("目标步数" + targetStep);
     }
 
     @Override

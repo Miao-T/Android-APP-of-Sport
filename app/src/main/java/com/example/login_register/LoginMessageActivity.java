@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
+import com.example.login_register.Utils.NetworkListener;
 import com.example.login_register.Utils.ReadData;
 import com.example.login_register.Utils.TimeCountUtil;
 import com.example.login_register.Utils.ToastUtil;
@@ -48,6 +49,8 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
     private String phoneNumber,messageCode,wholeNumber;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
+    private NetworkListener networkListener;
+    private boolean mNetworkResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +97,7 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
         mBtnLogin.setOnClickListener(this);
         mBtnRegister.setOnClickListener(this);
         mTvPsdLogin.setOnClickListener(this);
+        networkListener = new NetworkListener();
     }
 
     @Override
@@ -112,9 +116,15 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
                 }
                 break;
             case R.id.btn_loginM:
-                messageCode = mEtMessageMod.getText().toString().trim();
-                SMSSDK.submitVerificationCode("86",phoneNumber,messageCode);
-                flag = false;
+                mNetworkResult = networkListener.NetWorkState(LoginMessageActivity.this);
+                if(mNetworkResult){
+                    messageCode = mEtMessageMod.getText().toString().trim();
+                    SMSSDK.submitVerificationCode("86",phoneNumber,messageCode);
+                    flag = false;
+                }else{
+                    ToastUtil.showMsg(LoginMessageActivity.this,"请先打开移动数据，不然无法登录");
+                }
+
                 break;
             case R.id.tv_passwordLogin:
                 Intent intent = new Intent(LoginMessageActivity.this,LoginActivity.class);

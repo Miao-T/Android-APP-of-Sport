@@ -1,6 +1,7 @@
 package com.example.login_register;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,11 +22,18 @@ public class AliSqlActivity extends BaseActivity{
     private EditText mEtName;
     private Button mBtnSave,mBtnDelete,mBtnUpdate,mBtnRead,mBtnCreateTable,mBtnDropTable;
 
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ali_sql);
 
+        mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+        String a = mSharedPreferences.getString("DeviceMac",null);
+        Log.d("ali",a);
         mEtId = findViewById(R.id.et_id_cloud);
         mEtName = findViewById(R.id.et_name_cloud);
         mBtnSave = findViewById(R.id.btn_save_cloud);

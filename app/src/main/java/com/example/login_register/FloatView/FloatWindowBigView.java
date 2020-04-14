@@ -51,7 +51,7 @@ public class FloatWindowBigView extends LinearLayout {
 //                Bundle bundle = new Bundle();
 //                bundle.putString("data","back");
                 BLEActivity.data = 1;
-                Intent intent2 = new Intent(getContext(), BLEActivity.class);
+                Intent intent2 = new Intent(getContext(), MainActivity.class);
                 context.startActivity(intent2);
 
             }

@@ -26,6 +26,8 @@ import com.example.login_register.Utils.AgeUtil;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.GetJsonDataUtil;
 import com.example.login_register.Utils.MonitorText;
+import com.example.login_register.Utils.NetworkListener;
+import com.example.login_register.Utils.ToastUtil;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -55,6 +57,8 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
     private String province,city,area,location;
     private boolean flagSex = false,flagHeight = false,flagWeight = false,flagBirthday = false,flagLocation = false,flagStep = false;
     private String name;
+    private NetworkListener networkListener;
+    private boolean flagNetwork;
     /**
      * weight先点就有Bug
     * */
@@ -73,16 +77,12 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
         name = intent.getStringExtra("RegisterName");
 
         LitePal.initialize(this);
-        mRgSex = findViewById(R.id.rg_sex);
-        mTvHeight = findViewById(R.id.tv_height);
-        mTvWeight = findViewById(R.id.tv_weight);
-        mTvBirthday = findViewById(R.id.tv_birthday);
-        mTvAddress = findViewById(R.id.tv_address);
-        mTvStep = findViewById(R.id.tv_targetStep);
-        mBtnSave = findViewById(R.id.btn_save_userInfo);
-        mTvGap = findViewById(R.id.tv_gap);
+        initView();
         mBtnSave.setEnabled(false);
         mBtnSave.setClickable(false);
+        initJsonData();
+        TextWatcher();
+
 //        new MonitorText().SetMonitorText(mBtnSave,mTvHeight,mTvWeight,mTvBirthday,mTvAddress,mTvStep);
 
         mRgSex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -106,6 +106,25 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
                 }
             }
         });
+    }
+
+    private void TextWatcher(){
+        HeightWatcher();
+        WeightWatcher();
+        BirthdayWatcher();
+        LocationWatcher();
+        StepWatcher();
+    }
+
+    private void initView(){
+        mRgSex = findViewById(R.id.rg_sex);
+        mTvHeight = findViewById(R.id.tv_height);
+        mTvWeight = findViewById(R.id.tv_weight);
+        mTvBirthday = findViewById(R.id.tv_birthday);
+        mTvAddress = findViewById(R.id.tv_address);
+        mTvStep = findViewById(R.id.tv_targetStep);
+        mBtnSave = findViewById(R.id.btn_save_userInfo);
+        mTvGap = findViewById(R.id.tv_gap);
 
         mTvHeight.setOnClickListener(this);
         mTvWeight.setOnClickListener(this);
@@ -114,13 +133,8 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
         mTvStep.setOnClickListener(this);
         mBtnSave.setOnClickListener(this);
         mTvGap.setOnClickListener(this);
-        initJsonData();
 
-        HeightWatcher();
-        WeightWatcher();
-        BirthdayWatcher();
-        LocationWatcher();
-        StepWatcher();
+        networkListener = new NetworkListener();
     }
 
     @Override
@@ -154,7 +168,12 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
                 SingleOptionsPicker.openOptionsPicker(this, listStep,3, mTvStep);
                 break;
             case R.id.btn_save_userInfo:
-                SaveToDatabase();
+                flagNetwork = networkListener.NetWorkState(RegisterUserInfoActivity.this);
+                if(flagNetwork){
+                    SaveToDatabase();
+                }else{
+                    ToastUtil.showMsg(RegisterUserInfoActivity.this,"请先打开移动数据，不然无法录入个人信息");
+                }
                 break;
             case R.id.tv_gap:
                 Ignore();

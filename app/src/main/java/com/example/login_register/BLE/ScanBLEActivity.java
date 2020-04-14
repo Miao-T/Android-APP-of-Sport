@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.login_register.BLEActivity;
+import com.example.login_register.MainActivity;
 import com.example.login_register.R;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.ToastUtil;
@@ -112,22 +113,38 @@ public class ScanBLEActivity extends BaseActivity {
                 if(flag_item){
                     AlertDialog.Builder builder = new AlertDialog.Builder(ScanBLEActivity.this);
                     builder.setCancelable(false);
-                    builder.setTitle("蓝牙").setMessage("是否记住蓝牙，以便下次直接连接")
+                    builder.setTitle("蓝牙").setMessage("是否绑定蓝牙，以便下次直接连接")
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     flag_rememberMac = true;
                                     handler.removeCallbacks(runnable);
                                     mBluetoothAdapter.stopLeScan(scanCallback);
+//                                    mEditor.putString("DeviceMac",mBluetoothDevice.getAddress());
+//                                    mEditor.apply();
                                     Log.d(TAG,"connectBLE Remember" + mBluetoothDevice.getName());
+                                    Intent intent = new Intent(ScanBLEActivity.this, MainActivity.class);
+                                    intent.putExtra("FinishScan",true);
+                                    intent.putExtra("DeviceMac",mBluetoothDevice.getAddress());
+                                    intent.putExtra("RememberDevice",true);
+                                    startActivity(intent);
+                                    finish();
                                 }
                             }).setNeutralButton("No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             flag_rememberMac = false;
-                            mEditor.remove("MACAddress");
-                            mEditor.apply();
+                            handler.removeCallbacks(runnable);
+                            mBluetoothAdapter.stopLeScan(scanCallback);
+//                            mEditor.putString("DeviceMac","");
+//                            mEditor.apply();
                             Log.d(TAG,"connectBLE No Remember");
+                            Intent intent = new Intent(ScanBLEActivity.this, MainActivity.class);
+                            intent.putExtra("FinishScan",true);
+                            intent.putExtra("DeviceMac",mBluetoothDevice.getAddress());
+                            intent.putExtra("RememberDevice",false);
+                            startActivity(intent);
+                            finish();
                         }
                     }).show();
 

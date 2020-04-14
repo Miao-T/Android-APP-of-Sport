@@ -24,8 +24,8 @@ public class DBConnection implements ReadData {
     private static final String url = "jdbc:mysql://cdb-ksj8ugkk.bj.tencentcdb.com:10250/user";
     private static final String userName = "root";
     private static final String password = "DidideMiao531";
-
     private static boolean result;
+
     /**
      * 加载驱动
     * */
@@ -37,6 +37,35 @@ public class DBConnection implements ReadData {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * 注册账号
+     * */
+    public static void RegisterAccount(String name,String phoneNum,String email,String psd,String registerDate){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+//            String sql = "INSERT INTO userInfo(userId,userName) VALUES ('31116202','zgd')";
+            //String sql = "INSERT INTO demo(id,name) VALUES ('"+id+"','"+name+"')";
+            String sql = "INSERT INTO userInfo(userName,phoneNumber,email,password,registerDate) " +
+                    "VALUES ('"+name+"','"+phoneNum+"','"+email+"','"+psd+"','"+registerDate+"')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     /**
      * 注册后自动建表，表明为用户名
@@ -64,6 +93,70 @@ public class DBConnection implements ReadData {
         }
     }
 
+
+    /**
+     * 录入用户信息
+     * */
+    public static void UpdateUserInfoByName(int sex,int height,double weight,String birthday,int age,String location,int targetStep,String name){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String sql  = "UPDATE userInfo SET sex = '"+sex+"',height = '"+height+"',weight = '"+weight+"'," +
+                    "birthday = '"+birthday+"', age = '"+age+"',location = '"+location+"',targetStep = '"+targetStep+"'" +
+                    "WHERE userName = '"+name+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 读取用户信息
+     * */
+    @Override
+    public EnumMap<UserInfoData, Object> ReadCloudData(String name,String phoneNum) {
+        Connection connection = null;
+        EnumMap<UserInfoData,Object> retMap = new EnumMap<UserInfoData, Object>(UserInfoData.class);
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String sql = "SELECT userId,userName,password FROM userInfo WHERE userName = '"+name+"'  OR phoneNumber = '"+phoneNum+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                int userId = resultSet.getInt("userId");
+                String userName = resultSet.getString("userName");
+                String psd = resultSet.getString("password");
+                retMap.put(UserInfoData.userId,userId);
+                retMap.put(UserInfoData.password,psd);
+                retMap.put(UserInfoData.userName,userName);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try {
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return retMap;
+    }
+
+
     /**
      * 注销账号表
     * */
@@ -88,6 +181,36 @@ public class DBConnection implements ReadData {
             }
         }
     }
+
+
+    /**
+     * 注销账号信息
+     * */
+    public static void DeleteAccountData(String name){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
+            String sql = "DELETE FROM userInfo WHERE userName = '"+name+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+
+
 
     public static void Drop(String name){
         Connection connection = null;
@@ -118,83 +241,6 @@ public class DBConnection implements ReadData {
             Log.d("DB_tag","连接数据库成功！！！");
 //            String sql = "INSERT INTO userInfo(userId,userName) VALUES ('31116202','zgd')";
             String sql = "INSERT INTO t(time,stepData) VALUES ('2020-04-13 13:13:00','50')";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.execute(sql);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null){
-                try{
-                    connection.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-    /**
-     * 注册账号
-    * */
-    public static void RegisterAccount(String name,String phoneNum,String email,String psd,String registerDate){
-        Connection connection = null;
-        try{
-            connection = DriverManager.getConnection(url,userName,password);
-            Log.d("DB_tag","连接数据库成功！！！");
-//            String sql = "INSERT INTO userInfo(userId,userName) VALUES ('31116202','zgd')";
-            //String sql = "INSERT INTO demo(id,name) VALUES ('"+id+"','"+name+"')";
-            String sql = "INSERT INTO userInfo(userName,phoneNumber,email,password,registerDate) " +
-                    "VALUES ('"+name+"','"+phoneNum+"','"+email+"','"+psd+"','"+registerDate+"')";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.execute(sql);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null){
-                try{
-                    connection.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    /**
-     * 录入用户信息
-    * */
-    public static void UpdateUserInfoByName(int sex,int height,double weight,String birthday,int age,String location,int targetStep,String name){
-        Connection connection = null;
-        try{
-            connection = DriverManager.getConnection(url,userName,password);
-            Log.d("DB_tag","连接数据库成功！！！");
-            String sql  = "UPDATE userInfo SET sex = '"+sex+"',height = '"+height+"',weight = '"+weight+"'," +
-                    "birthday = '"+birthday+"', age = '"+age+"',location = '"+location+"',targetStep = '"+targetStep+"'" +
-                    "WHERE userName = '"+name+"'";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.execute(sql);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null){
-                try{
-                    connection.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    /**
-     * 注销账号信息
-    * */
-    public static void DeleteAccountData(String name){
-        Connection connection = null;
-        try{
-            connection = DriverManager.getConnection(url,userName,password);
-            Log.d("DB_tag","连接数据库成功！！！");
-            //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
-            String sql = "DELETE FROM userInfo WHERE userName = '"+name+"'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -251,38 +297,6 @@ public class DBConnection implements ReadData {
                 }
             }
         }
-    }
-
-    @Override
-    public EnumMap<UserInfoData, Object> ReadCloudData(String name,String phoneNum) {
-        Connection connection = null;
-        EnumMap<UserInfoData,Object> retMap = new EnumMap<UserInfoData, Object>(UserInfoData.class);
-        try{
-            connection = DriverManager.getConnection(url,userName,password);
-            Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "SELECT userId,userName,password FROM userInfo WHERE userName = '"+name+"'  OR phoneNumber = '"+phoneNum+"'";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()){
-                int userId = resultSet.getInt("userId");
-                String userName = resultSet.getString("userName");
-                String psd = resultSet.getString("password");
-                retMap.put(UserInfoData.userId,userId);
-                retMap.put(UserInfoData.password,psd);
-                retMap.put(UserInfoData.userName,userName);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null){
-                try {
-                    connection.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-        return retMap;
     }
 
     public static boolean CheckNameRegistered(String name){
