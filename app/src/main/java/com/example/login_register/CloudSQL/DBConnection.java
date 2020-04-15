@@ -6,6 +6,7 @@ import androidx.annotation.RequiresPermission;
 
 import com.example.login_register.R;
 import com.example.login_register.Utils.ReadData;
+import com.github.mikephil.charting.data.BarEntry;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,8 +15,10 @@ import java.sql.ResultSet;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumMap;
+import java.util.List;
 
 import javax.xml.transform.Result;
 
@@ -211,6 +214,56 @@ public class DBConnection implements ReadData {
 
 
 
+
+    public static void InsertStep(String date,String step){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String sql = "INSERT INTO t(time,stepData) VALUES ('2020-04-15 "+date+"','"+step+"')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static List ReadStep(){
+        Connection connection = null;
+        List stepList = new ArrayList();
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String exactTime= "2020-04-15 12:%";
+            String sql = "SELECT stepData FROM t WHERE time LIKE '"+exactTime+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                int step = resultSet.getInt("stepData");
+                Log.d("DB_tag",String.valueOf(step));
+                stepList.add(step);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return stepList;
+    }
 
     public static void Drop(String name){
         Connection connection = null;

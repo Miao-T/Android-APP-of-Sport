@@ -4,9 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.login_register.CloudSQL.DBConnection;
 
@@ -14,7 +16,7 @@ import static com.example.login_register.Utils.ActivityCollector.finishAll;
 
 public class SettingActivity extends AppCompatActivity {
 
-    private Button mBtnCancel;
+    private TextView mBtnCancel;
     private static final String TAG = "DB_tag" ;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
@@ -34,6 +36,7 @@ public class SettingActivity extends AppCompatActivity {
         }).start();
 
         mBtnCancel = findViewById(R.id.btn_cancelAccount);
+        mBtnCancel.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         mBtnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -42,12 +45,7 @@ public class SettingActivity extends AppCompatActivity {
                     public void run() {
                         DBConnection.DropTable(LoginName);
                         DBConnection.DeleteAccountData(LoginName);
-                        mEditor.putBoolean("has_login",false);
-                        mEditor.putBoolean("is_remember",false);
-                        mEditor.remove("RememberName");
-                        mEditor.remove("is_remember");
-                        mEditor.remove("MACAddress");
-                        mEditor.remove("StepLastTime");
+                        mEditor.clear();
                         mEditor.apply();
                     }
                 }).start();

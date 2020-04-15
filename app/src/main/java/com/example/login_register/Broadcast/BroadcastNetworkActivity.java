@@ -12,40 +12,51 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.login_register.R;
+import com.example.login_register.Service.TimerService;
 import com.example.login_register.Utils.ToastUtil;
 
 public class BroadcastNetworkActivity extends AppCompatActivity {
-
     private IntentFilter intentFilter;
-    private NetWorkChangeReceiver netWorkChangeReceiver;
+    private TimeChangeReceiver timeChangeReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast_network);
-
+//        Intent intent = new Intent(this, TimerService.class);
+//        startService(intent);
+        Log.d("BLEtimer","start");
         intentFilter = new IntentFilter();
-        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        netWorkChangeReceiver = new NetWorkChangeReceiver();
-        registerReceiver(netWorkChangeReceiver,intentFilter);
+        timeChangeReceiver = new TimeChangeReceiver();
+        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        registerReceiver(timeChangeReceiver,intentFilter);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(netWorkChangeReceiver);
+        unregisterReceiver(timeChangeReceiver);
     }
 
-    class NetWorkChangeReceiver extends BroadcastReceiver{
-        @Override
+    class TimeChangeReceiver extends BroadcastReceiver{
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            if(networkInfo != null && networkInfo.isAvailable()){
-                ToastUtil.showMsg(BroadcastNetworkActivity.this,"network is available");
-            }else {
-                ToastUtil.showMsg(BroadcastNetworkActivity.this,"network is unavailable");
+            String action = intent.getAction();
+            if(action.equals(Intent.ACTION_TIME_TICK)){
+                Log.d("BLEtimer","time change ok");
+                ToastUtil.showMsg(BroadcastNetworkActivity.this,"time change");
             }
-            Log.d("breoadcast","network change");
         }
     }
+//    class NetWorkChangeReceiver extends BroadcastReceiver{
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+//            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+//            if(networkInfo != null && networkInfo.isAvailable()){
+//                ToastUtil.showMsg(BroadcastNetworkActivity.this,"network is available");
+//            }else {
+//                ToastUtil.showMsg(BroadcastNetworkActivity.this,"network is unavailable");
+//            }
+//            Log.d("breoadcast","network change");
+//        }
+//    }
 }

@@ -26,14 +26,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Broadcast.BroadcastNetworkActivity">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
-        <activity android:name=".BLE.ScanBLEActivity">
+        <activity android:name=".DeviceActivity"></activity>
+        <activity android:name=".Broadcast.BroadcastNetworkActivity" />
+        <activity android:name=".BLE.ScanBLEActivity" />
+        <activity android:name=".AlterUserInfoActivity" />
+        <activity android:name=".SettingActivity" />
+        <activity android:name=".RegisterUserInfoActivity" />
+        <activity android:name=".AliSqlActivity">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
@@ -42,13 +41,17 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".AlterUserInfoActivity" />
-        <activity android:name=".SettingActivity" />
-        <activity android:name=".RegisterUserInfoActivity" />
-        <activity android:name=".AliSqlActivity" />
         <activity android:name=".WelcomeActivity" />
         <activity android:name=".OptionPickerActivity" />
-        <activity android:name=".BarActivity" />
+        <activity android:name=".BarActivity">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
         <activity
             android:name="com.mob.tools.MobUIShell"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -66,7 +69,7 @@
         <activity android:name=".LitePalActivity" />
         <activity
             android:name=".BLEActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
@@ -75,7 +78,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:launchMode="singleTask">
 
             <!-- <intent-filter> -->
@@ -87,6 +91,10 @@
         </activity>
 
         <service android:name=".Service.FloatWindowService" />
+        <service
+            android:name=".Service.TimerService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

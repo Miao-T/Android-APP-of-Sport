@@ -91,8 +91,10 @@ public class MainActivity extends BaseActivity {
     static Runnable runnable;
     //从ScanActivity传过来的MAC地址
     private String DeviceMacIntent;
+    private String DeviceNameIntent;
     //SharedPreference里保存的
     private String DeviceMacSP;
+    private String DeviceNameSP;
     public static String dataBle;
 
     @Override
@@ -109,6 +111,7 @@ public class MainActivity extends BaseActivity {
         mDatas = new ArrayList<>();
         mRssis = new ArrayList<>();
 
+        mCurrentFragment = new Fragment();
         homeFragment = new HomeFragment();
         mainFragment = new MainFragment();
         mineFragment = new MineFragment();
@@ -121,13 +124,16 @@ public class MainActivity extends BaseActivity {
         mEditor = mSharedPreferences.edit();
         String LoginName = mSharedPreferences.getString("RememberName",null);
         DeviceMacSP = mSharedPreferences.getString("DeviceMac",null);
+        DeviceNameSP = mSharedPreferences.getString("DeviceName",null);
 
         Log.d(TAG,"activity" + LoginName);
         Log.d(TAG,"activity" + DeviceMacSP);
+        Log.d(TAG,"activity" + DeviceNameSP);
         Intent ScanIntent = getIntent();
         flag_finishScan = ScanIntent.getBooleanExtra("FinishScan",false);
         flag_rememberDevice = ScanIntent.getBooleanExtra("RememberDevice",false);
         DeviceMacIntent = ScanIntent.getStringExtra("DeviceMac");
+        DeviceNameIntent = ScanIntent.getStringExtra("DeviceName");
 
         if(flag_finishScan){
             BluetoothDevice Device = mBluetoothAdapter.getRemoteDevice(DeviceMacIntent);
@@ -157,16 +163,19 @@ public class MainActivity extends BaseActivity {
                     case R.id.tab1:
                         hideFragment(fragmentTransaction);
                         fragmentTransaction.show(homeFragment).commit();
+                        mCurrentFragment = homeFragment;
                         ToastUtil.showMsg(MainActivity.this,"tag1");
                         break;
                     case R.id.tab2:
                         hideFragment(fragmentTransaction);
                         fragmentTransaction.show(mainFragment).commit();
+                        mCurrentFragment = mainFragment;
                         ToastUtil.showMsg(MainActivity.this,"tag2");
                         break;
                     case R.id.tab3:
                         hideFragment(fragmentTransaction);
                         fragmentTransaction.show(mineFragment).commit();
+                        mCurrentFragment = mineFragment;
                         ToastUtil.showMsg(MainActivity.this,"tag3");
                         break;
                 }
@@ -186,6 +195,7 @@ public class MainActivity extends BaseActivity {
             fragmentTransaction.hide(mineFragment);
         }
     }
+
     /**
      * 开始扫描5秒后自动停止
      * */
@@ -245,9 +255,11 @@ public class MainActivity extends BaseActivity {
 //        }
         if(flag_finishScan && flag_rememberDevice){
             mEditor.putString("DeviceMac",DeviceMacIntent);
+            mEditor.putString("DeviceName",DeviceNameIntent);
             mEditor.apply();
         }else if((!flag_rememberDevice) && flag_finishScan){
             mEditor.remove("DeviceMac");
+            mEditor.remove("DeviceName");
             mEditor.apply();
         }
         Log.d(TAG,bluetoothDevice.getAddress());
@@ -387,45 +399,36 @@ public class MainActivity extends BaseActivity {
         return sb.toString();
     }
 
-    private void switchFragment(Fragment target){
-        if(mCurrentFragment == target)
-            return;
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if(mCurrentFragment != null){
-            transaction.hide(mCurrentFragment);
-        }
-        if(target.isAdded()){
-            transaction.show(target);
-        }else{
-            transaction.add(R.id.contentContainer,target,target.getClass().getName());
-        }
-        transaction.commit();
-        mCurrentFragment = target;
-    }
+//    @Override
+//    public void onBackPressed() {
+//        //mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.content_container);
+//        Log.d("fragment",String.valueOf(mCurrentFragment));
+//        if(mCurrentFragment != homeFragment){
+//            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//            hideFragment(fragmentTransaction);
+//            fragmentTransaction.show(homeFragment).commit();
+//            mBottomBar.selectTabWithId(R.id.tab1);
+//            return;
+//        }else{
+//            moveTaskToBack(true);
+//        }
+//        super.onBackPressed();
+//    }
+
 
     @Override
-    public void onBackPressed() {
-        mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.content_container);
-        Log.d("fragment",String.valueOf(mCurrentFragment));
-        if(mCurrentFragment != homeFragment){
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            hideFragment(fragmentTransaction);
-            fragmentTransaction.show(homeFragment).commit();
-            mBottomBar.selectTabWithId(R.id.tab1);
-            return;
-        }else{
-            moveTaskToBack(true);
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if(mCurrentFragment != homeFragment){
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                hideFragment(fragmentTransaction);
+                fragmentTransaction.show(homeFragment).commit();
+                mBottomBar.selectTabWithId(R.id.tab1);
+            }else{
+                moveTaskToBack(true);
+            }
+            return true;
         }
-        super.onBackPressed();
+        return super.onKeyDown(keyCode, event);
     }
-
-
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if (keyCode == KeyEvent.KEYCODE_BACK) {
-//            moveTaskToBack(true);
-//            return true;
-//        }
-//        return super.onKeyDown(keyCode, event);
-//    }
 }

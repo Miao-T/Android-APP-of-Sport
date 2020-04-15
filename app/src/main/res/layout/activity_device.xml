@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DeviceActivity"
+    android:layout_marginTop="80dp"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/tv_deviceName"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"/>
+
+    <TextView
+        android:id="@+id/tv_deviceMAC"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@id/tv_deviceName"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/btn_changeBleDevice"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@id/tv_deviceMAC"
+        android:layout_marginTop="100dp"
+        android:text="更换手环设备"
+        android:textSize="20sp"/>
+</RelativeLayout>

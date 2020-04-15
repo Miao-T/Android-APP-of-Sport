@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.login_register.AlterUserInfoActivity;
 import com.example.login_register.CloudSQL.DBConnection;
+import com.example.login_register.DeviceActivity;
 import com.example.login_register.R;
 import com.example.login_register.SettingActivity;
 import com.example.login_register.Utils.ReadData;
@@ -31,9 +32,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private String loginName;
-    private int userId,sexInt,height,targetStep;
-    private double weight;
-    private String sex,registerTime,phoneNumber,birthday,location;
+//    private int userId,sexInt,height,targetStep;
+//    private double weight;
+//    private String sex,registerTime,phoneNumber,birthday,location;
 
     //fragment loginName,registerTime,targetStep
     //alterActivity sex,height,weight,birthday,location
@@ -63,12 +64,12 @@ public class MineFragment extends Fragment implements View.OnClickListener {
 //                registerTime = String.valueOf(userInfo.get(ReadData.UserInfoData.registerTime));
 //                targetStep = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.targetStep)));
 //
-//                sexInt = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.sex)));
-//                if(sexInt == 1){sex = "女";}else{sex = "男";}
-//                height = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.height)));
-//                weight = Double.parseDouble(String.valueOf(userInfo.get(ReadData.UserInfoData.weight)));
-//                birthday = String.valueOf(userInfo.get(ReadData.UserInfoData.birthday));
-//                location = String.valueOf(userInfo.get(ReadData.UserInfoData.location));
+////                sexInt = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.sex)));
+////                if(sexInt == 1){sex = "女";}else{sex = "男";}
+////                height = Integer.parseInt(String.valueOf(userInfo.get(ReadData.UserInfoData.height)));
+////                weight = Double.parseDouble(String.valueOf(userInfo.get(ReadData.UserInfoData.weight)));
+////                birthday = String.valueOf(userInfo.get(ReadData.UserInfoData.birthday));
+////                location = String.valueOf(userInfo.get(ReadData.UserInfoData.location));
 //            }
 //        }).start();
 
@@ -86,9 +87,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mBtnSetting.setOnClickListener(this);
         mBtnOffline.setOnClickListener(this);
 
-//        mTvMine.setText(loginName);
-//        mTvTotalDay.setText("您已使用" + "i" + "天，达标" + "j" + "天");
-//        mTvStep.setText("目标步数" + targetStep);
+        mTvMine.setText(loginName);
+        //mTvTotalDay.setText("您已使用" + "i" + "天，达标" + "j" + "天");
+        //mTvStep.setText("目标步数" + targetStep);
     }
 
     @Override
@@ -100,6 +101,8 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.btn_deviceInfo:
+                intent = new Intent(getActivity(), DeviceActivity.class);
+                startActivity(intent);
                 break;
             case  R.id.btn_setting:
                 intent = new Intent(getActivity(), SettingActivity.class);

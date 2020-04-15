@@ -15,7 +15,9 @@ import com.example.login_register.Utils.ActivityCollector;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.ReadData;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 public class AliSqlActivity extends BaseActivity{
     private EditText mEtId;
@@ -55,7 +57,9 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                 @Override
                     public void run() {
-                    DBConnection.InsertData();
+                    String date = mEtId.getText().toString();
+                    String step = mEtName.getText().toString();
+                    DBConnection.InsertStep(date,step);
                 }
             }).start();
             }
@@ -94,6 +98,11 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        List list = new ArrayList();
+                        list = DBConnection.ReadStep();
+                        for(int i = 0; i < list.size(); i++){
+                            Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
+                        }
 //                        DBConnection.DriverConnection();
 //                        String Name = mEtName.getText().toString();
 //                        ReadData readData = new DBConnection();

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:layout_marginTop="60dp">
+
+    <RelativeLayout
+        android:id="@+id/btn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="vertical">
+        <RadioGroup
+            android:id="@+id/bg_choice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/rb_day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="每日"
+                android:layout_weight="1"/>
+            <RadioButton
+                android:id="@+id/rb_week"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="每周"
+                android:layout_weight="1"/>
+            <RadioButton
+                android:id="@+id/rb_month"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="每月"
+                android:layout_weight="1"/>
+        </RadioGroup>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/date_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/btn_layout"
+        android:layout_marginTop="20dp">
+        <Button
+            android:id="@+id/btn_choiceLeft"
+            android:layout_width="20dp"
+            android:layout_height="50dp"
+            android:background="@color/colorBlack"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@id/btn_choiceLeft"
+            android:gravity="center_horizontal"
+            android:text="XXXX年XX月XX日"
+            android:textSize="30sp"
+            android:layout_weight="7"/>
+        <Button
+            android:id="@+id/btn_choiceRight"
+            android:layout_width="20dp"
+            android:layout_height="50dp"
+            android:background="@color/colorBlack"
+            android:layout_toRightOf="@id/tv_date"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+<!--    <TextView-->
+<!--        android:id="@+id/tv_date"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:layout_below="@id/btn_layout"-->
+<!--        android:layout_marginTop="30dp"-->
+<!--        android:text="日期"-->
+<!--        android:textSize="30sp"-->
+<!--        android:gravity="center_horizontal"/>-->
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@id/date_layout"
+        android:layout_marginTop="60dp">
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/bar_chart"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+    </RelativeLayout>
+
+</RelativeLayout>

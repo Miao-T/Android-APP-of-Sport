@@ -20,7 +20,7 @@ public class MyFormatter implements IAxisValueFormatter{
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        if(value == 1){
+        if (value == 1){
             return "Monday";
         }
         if (value == 2) {
@@ -38,9 +38,9 @@ public class MyFormatter implements IAxisValueFormatter{
         if (value == 6) {
             return "Saturday";
         }
-        if (value == 7) {
-            return "Sunday";
-        }
+//        if (value == 7) {
+//            return "Sunday";
+//        }
         return "";
     }
 

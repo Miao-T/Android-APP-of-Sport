@@ -4,21 +4,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingActivity">
+    tools:context=".SettingActivity"
+    android:padding="20dp">
 
     <TextView
         android:id="@+id/tv_version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="版本号："
+        android:text="  APP版本号：  0.0.1"
         android:textSize="20sp"
+        android:textColor="@color/colorBlack"
         android:layout_marginTop="50dp"/>
-    <Button
-        android:id="@+id/btn_cancelAccount"
+
+    <TextView
+        android:id="@+id/tv_producer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="注销账号"
-        android:padding="30dp"
-        android:layout_below="@id/tv_version"
-        android:layout_marginTop="50dp"/>
+        android:text="  APP制作人：  TZ"
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
+        android:layout_marginTop="50dp"
+        android:layout_below="@id/tv_version"/>
+
+    <TextView
+        android:id="@+id/tv_contactWithProducerPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="  联系电话：  15850725521"
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
+        android:layout_marginTop="50dp"
+        android:layout_below="@id/tv_producer"/>
+
+    <TextView
+        android:id="@+id/tv_contactWithProducerEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="  联系邮箱：  tangzhen531@126.com"
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
+        android:layout_marginTop="50dp"
+        android:layout_below="@id/tv_contactWithProducerPhone"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/btn_cancelAccount"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="注销账号"
+            android:textSize="20sp"
+            android:gravity="center_horizontal"
+            android:textColor="@color/colorBlack"/>
+    </LinearLayout>
+
 </RelativeLayout>
