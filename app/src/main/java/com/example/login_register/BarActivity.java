@@ -50,12 +50,13 @@ public class BarActivity extends BaseActivity {
             @Override
             public void run() {
                 DBConnection.DriverConnection();
-                list = DBConnection.ReadStep();
+                list = DBConnection.ReadStep("2020-04-16","t");
 //                for(int i = 0; i < list.size(); i++){
 //                    Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
 //                }
             }
         }).start();
+
         Handler handler = new Handler();
         Runnable runnable = new Runnable() {
             @Override
@@ -64,7 +65,7 @@ public class BarActivity extends BaseActivity {
                 DrawChart();
             }
         };
-        handler.postDelayed(runnable,5000);
+        handler.postDelayed(runnable,3000);
 
 //        barChart.setDrawBorders(true);
 //        //设置数据
@@ -89,7 +90,7 @@ public class BarActivity extends BaseActivity {
             Log.d("DB_tag",String.valueOf(i));
             String step = String.valueOf(list.get(i));
             Log.d("DB_tag","list  " + step);
-            barEntries.add(new BarEntry(i,Float.parseFloat(step)));
+            barEntries.add(new BarEntry(i,Integer.parseInt(step)));
         }
         String name = "步数";
         BarDataSet barDataSet = new BarDataSet(barEntries,name);

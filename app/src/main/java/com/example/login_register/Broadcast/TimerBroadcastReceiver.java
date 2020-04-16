@@ -5,9 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.example.login_register.Utils.ToastUtil;
+
 public class TimerBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("BLEtimer","time change");
+        String action = intent.getAction();
+        if(action.equals(Intent.ACTION_TIME_TICK)){
+            Log.d("BLEtimer","time change ok");
+
+        }
     }
 }

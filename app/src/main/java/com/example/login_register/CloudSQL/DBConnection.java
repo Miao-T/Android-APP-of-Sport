@@ -211,39 +211,17 @@ public class DBConnection implements ReadData {
         }
     }
 
-
-
-
-
-    public static void InsertStep(String date,String step){
-        Connection connection = null;
-        try{
-            connection = DriverManager.getConnection(url,userName,password);
-            Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "INSERT INTO t(time,stepData) VALUES ('2020-04-15 "+date+"','"+step+"')";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.execute(sql);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null){
-                try{
-                    connection.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static List ReadStep(){
+    /**
+     * 模糊查询步数
+    * */
+    public static List ReadStep(String time,String tableName){
         Connection connection = null;
         List stepList = new ArrayList();
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String exactTime= "2020-04-15 12:%";
-            String sql = "SELECT stepData FROM t WHERE time LIKE '"+exactTime+"'";
+            String exactTime= time + "%";
+            String sql = "SELECT stepData FROM "+tableName+" WHERE time LIKE '"+exactTime+"'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
@@ -263,6 +241,30 @@ public class DBConnection implements ReadData {
             }
         }
         return stepList;
+    }
+
+
+
+    public static void InsertStep(String date,String step){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String dateInsert = "2020-03-01" + date + ":00:00";
+            String sql = "INSERT INTO tlindidi(time,stepData) VALUES ('"+dateInsert+"','"+step+"')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public static void Drop(String name){
@@ -309,13 +311,13 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static void Delete(String name){
+    public static void Delete(){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
             //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
-            String sql = "DELETE FROM userInfo WHERE userName = '"+name+"'";
+            String sql = "DELETE FROM t WHERE stepData = '50'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){

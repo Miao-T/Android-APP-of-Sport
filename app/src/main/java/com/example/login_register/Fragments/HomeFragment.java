@@ -1,6 +1,7 @@
 package com.example.login_register.Fragments;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.example.login_register.Utils.ActivityCollector;
 public class HomeFragment extends Fragment {
 
     private TextView mTvUpdateStep;
+    private TextView mTvError;
     private Button mBtnFloatBle;
 
     @Nullable
@@ -34,7 +36,9 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTvUpdateStep = view.findViewById(R.id.tv_updateStep);
+        mTvError = view.findViewById(R.id.tv_error);
         mBtnFloatBle = view.findViewById(R.id.btn_floatBle);
+        mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
 
         mBtnFloatBle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,6 +47,13 @@ public class HomeFragment extends Fragment {
                 getActivity().startService(intent);
                 getActivity().moveTaskToBack(true);
                 //ActivityCollector.finishAll();
+            }
+        });
+
+        mTvError.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }

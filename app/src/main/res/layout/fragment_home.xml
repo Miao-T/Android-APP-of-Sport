@@ -8,13 +8,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="50sp"
+        android:gravity="center_horizontal"
         android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/tv_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="再次扫描手环蓝牙"
+        android:textSize="20sp"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/tv_updateStep"
+        android:layout_marginTop="20dp"/>
 
     <Button
         android:id="@+id/btn_floatBle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_updateStep"
+        android:layout_below="@id/tv_error"
         android:layout_marginTop="20dp"
         android:text="浮窗"/>
 </RelativeLayout>

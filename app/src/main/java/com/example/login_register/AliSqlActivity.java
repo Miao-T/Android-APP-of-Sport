@@ -14,6 +14,7 @@ import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.ActivityCollector;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.ReadData;
+import com.example.login_register.Utils.WeekUtil;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -71,8 +72,7 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        String Name = mEtName.getText().toString();
-                        DBConnection.Delete(Name);
+                        DBConnection.Delete();
                     }
                 }).start();
             }
@@ -99,7 +99,7 @@ public class AliSqlActivity extends BaseActivity{
                     @Override
                     public void run() {
                         List list = new ArrayList();
-                        list = DBConnection.ReadStep();
+                        //list = DBConnection.ReadStep();
                         for(int i = 0; i < list.size(); i++){
                             Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
                         }

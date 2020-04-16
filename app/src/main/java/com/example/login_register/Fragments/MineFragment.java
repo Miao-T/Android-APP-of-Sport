@@ -111,7 +111,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
             case R.id.btn_offline:
                 intent = new Intent("com.example.login.FORCE_OFFLINE");
                 getActivity().sendBroadcast(intent);
-                mEditor.putBoolean("has_login",false);
+                mEditor.clear();
                 mEditor.apply();
                 break;
         }

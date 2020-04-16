@@ -409,12 +409,12 @@ public class BLEActivity extends BaseActivity {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
             Date date = new Date(System.currentTimeMillis());
 
-            UserInfo userInfo = LitePal.findLast(UserInfo.class);
-            DailyRecord dailyRecord = new DailyRecord();
-            dailyRecord.setDate(simpleDateFormat.format(date));
-            dailyRecord.setStep(Integer.valueOf(bytes2hex(data)));
-            dailyRecord.setUserInfo(userInfo);
-            dailyRecord.save();
+//            UserInfo userInfo = LitePal.findLast(UserInfo.class);
+//            DailyRecord dailyRecord = new DailyRecord();
+//            dailyRecord.setDate(simpleDateFormat.format(date));
+//            dailyRecord.setStep(Integer.valueOf(bytes2hex(data)));
+//            dailyRecord.setUserInfo(userInfo);
+//            dailyRecord.save();
 
             dataBle = bytes2hex(data);
 

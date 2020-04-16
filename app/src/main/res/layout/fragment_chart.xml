@@ -12,7 +12,7 @@
         android:layout_height="50dp"
         android:orientation="vertical">
         <RadioGroup
-            android:id="@+id/bg_choice"
+            android:id="@+id/rg_choice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -21,7 +21,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="每日"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:checked="true"/>
             <RadioButton
                 android:id="@+id/rb_week"
                 android:layout_width="match_parent"
@@ -45,25 +46,26 @@
         android:layout_marginTop="20dp">
         <Button
             android:id="@+id/btn_choiceLeft"
-            android:layout_width="20dp"
-            android:layout_height="50dp"
-            android:background="@color/colorBlack"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/button_left"
+            android:gravity="center_vertical"
             android:layout_weight="1"/>
         <TextView
             android:id="@+id/tv_date"
             android:layout_width="200dp"
             android:layout_height="50dp"
             android:layout_toRightOf="@id/btn_choiceLeft"
-            android:gravity="center_horizontal"
-            android:text="XXXX年XX月XX日"
+            android:gravity="center"
+            android:text=""
             android:textSize="30sp"
             android:layout_weight="7"/>
         <Button
             android:id="@+id/btn_choiceRight"
-            android:layout_width="20dp"
-            android:layout_height="50dp"
-            android:background="@color/colorBlack"
-            android:layout_toRightOf="@id/tv_date"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/button_right"
+            android:gravity="center_vertical"
             android:layout_weight="1"/>
     </LinearLayout>
 

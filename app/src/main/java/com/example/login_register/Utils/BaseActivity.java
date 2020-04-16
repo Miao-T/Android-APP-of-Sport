@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.login_register.Broadcast.BroadcastNetworkActivity;
 import com.example.login_register.LoginActivity;
+import com.example.login_register.MainActivity;
 
 public class BaseActivity extends AppCompatActivity {
     private ForceOfflineReceiver forceOfflineReceiver;
@@ -72,30 +73,4 @@ public class BaseActivity extends AppCompatActivity {
             builder.show();
         }
     }
-
-//    class NetWorkChangeReceiver extends BroadcastReceiver{
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-//            final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-//            if(networkInfo != null && networkInfo.isAvailable()){
-//                networkOk = true;
-//                ToastUtil.showMsg(context,"移动数据已打开");
-////                ToastUtil.showMsg(BroadcastNetworkActivity.this,"network is available");
-//            }else {
-//                networkOk = false;
-//                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                builder.setTitle("Warning");
-//                builder.setMessage("移动数据已关闭，请先打开移动数据");
-//                builder.setCancelable(false);
-//                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                    }
-//                });
-//                builder.show();
-////                ToastUtil.showMsg(BroadcastNetworkActivity.this,"network is unavailable");
-//            }
-//        }
-//    }
 }

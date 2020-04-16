@@ -126,6 +126,7 @@ public class ScanBLEActivity extends BaseActivity {
                                     Intent intent = new Intent(ScanBLEActivity.this, MainActivity.class);
                                     intent.putExtra("FinishScan",true);
                                     intent.putExtra("DeviceMac",mBluetoothDevice.getAddress());
+                                    intent.putExtra("DeviceName",mBluetoothDevice.getName());
                                     intent.putExtra("RememberDevice",true);
                                     startActivity(intent);
                                     finish();

@@ -29,6 +29,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.login_register.BLE.BleAdapter;
+import com.example.login_register.Fragments.ChartFragment;
 import com.example.login_register.Fragments.HomeFragment;
 import com.example.login_register.Fragments.MainFragment;
 import com.example.login_register.Fragments.MineFragment;
@@ -53,7 +54,7 @@ import java.util.UUID;
 
 import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity{
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
@@ -66,6 +67,7 @@ public class MainActivity extends BaseActivity {
     private HomeFragment homeFragment;
     private MainFragment mainFragment;
     private MineFragment mineFragment;
+    private ChartFragment chartFragment;
     private Fragment mCurrentFragment;
 
     private List<BluetoothDevice> mDatas;
@@ -97,11 +99,13 @@ public class MainActivity extends BaseActivity {
     private String DeviceNameSP;
     public static String dataBle;
 
+    public static MainActivity instance;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        instance = this;
         mBluetoothManager = (BluetoothManager)getSystemService(BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()){
@@ -111,29 +115,7 @@ public class MainActivity extends BaseActivity {
         mDatas = new ArrayList<>();
         mRssis = new ArrayList<>();
 
-        mCurrentFragment = new Fragment();
-        homeFragment = new HomeFragment();
-        mainFragment = new MainFragment();
-        mineFragment = new MineFragment();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.contentContainer,homeFragment)
-                .add(R.id.contentContainer,mainFragment).add(R.id.contentContainer,mineFragment).commit();
-        mBottomBar = findViewById(R.id.bottomBar);
-
-        mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
-        mEditor = mSharedPreferences.edit();
-        String LoginName = mSharedPreferences.getString("RememberName",null);
-        DeviceMacSP = mSharedPreferences.getString("DeviceMac",null);
-        DeviceNameSP = mSharedPreferences.getString("DeviceName",null);
-
-        Log.d(TAG,"activity" + LoginName);
-        Log.d(TAG,"activity" + DeviceMacSP);
-        Log.d(TAG,"activity" + DeviceNameSP);
-        Intent ScanIntent = getIntent();
-        flag_finishScan = ScanIntent.getBooleanExtra("FinishScan",false);
-        flag_rememberDevice = ScanIntent.getBooleanExtra("RememberDevice",false);
-        DeviceMacIntent = ScanIntent.getStringExtra("DeviceMac");
-        DeviceNameIntent = ScanIntent.getStringExtra("DeviceName");
+        getData();
 
         if(flag_finishScan){
             BluetoothDevice Device = mBluetoothAdapter.getRemoteDevice(DeviceMacIntent);
@@ -142,10 +124,55 @@ public class MainActivity extends BaseActivity {
             scanDevice();
         }
 
+        initFragment();
+
+    }
+
+    private void getData(){
+        mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+        String LoginName = mSharedPreferences.getString("RememberName",null);
+        DeviceMacSP = mSharedPreferences.getString("DeviceMac",null);
+        DeviceNameSP = mSharedPreferences.getString("DeviceName",null);
+
+//        if(Step.equals("step")){
+//            TextView mTvUpdateStep = homeFragment.getView().findViewById(R.id.tv_updateStep);
+//            mTvUpdateStep.setText("Start");
+//        }else{
+//            TextView mTvUpdateStep = homeFragment.getView().findViewById(R.id.tv_updateStep);
+//            mTvUpdateStep.setText(rememberStep);
+//        }
+        Log.d(TAG,"activity" + LoginName);
+        Log.d(TAG,"sp" + DeviceMacSP);
+        Log.d(TAG,"sp" + DeviceNameSP);
+
+        Intent ScanIntent = getIntent();
+        flag_finishScan = ScanIntent.getBooleanExtra("FinishScan",false);
+        flag_rememberDevice = ScanIntent.getBooleanExtra("RememberDevice",false);
+        DeviceMacIntent = ScanIntent.getStringExtra("DeviceMac");
+        DeviceNameIntent = ScanIntent.getStringExtra("DeviceName");
+
+        Log.d(TAG,"intent" + DeviceMacIntent);
+        Log.d(TAG,"intent" + DeviceNameIntent);
+    }
+
+    private void initFragment(){
+        mCurrentFragment = new Fragment();
+        homeFragment = new HomeFragment();
+        mainFragment = new MainFragment();
+        //mineFragment = new MineFragment();
+        chartFragment = new ChartFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.contentContainer,homeFragment)
+                .add(R.id.contentContainer,mainFragment)
+                //.add(R.id.contentContainer,mineFragment)
+                .add(R.id.contentContainer,chartFragment)
+                .commit();
+        mBottomBar = findViewById(R.id.bottomBar);
 
         /**
          * activity-fragment传数据
-        * */
+         * */
 //        Bundle bundle = new Bundle();
 //        bundle.putString("LoginName", LoginName);
 //        //首先有一个Fragment对象 调用这个对象的setArguments(bundle)传递数据
@@ -154,6 +181,11 @@ public class MainActivity extends BaseActivity {
         //        Bundle bundle = getArguments();
 //        LoginName = bundle.getString("LoginName");
 //        Log.d(TAG,"fragment" + LoginName);
+
+        String rememberStep = mSharedPreferences.getString("StepLastTime",null);
+        Log.d("DB_tag","remember" + rememberStep);
+//        TextView mTvUpdateStep = homeFragment.getView().findViewById(R.id.tv_updateStep);
+//        mTvUpdateStep.setText(rememberStep);
 
         mBottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
@@ -174,15 +206,17 @@ public class MainActivity extends BaseActivity {
                         break;
                     case R.id.tab3:
                         hideFragment(fragmentTransaction);
-                        fragmentTransaction.show(mineFragment).commit();
-                        mCurrentFragment = mineFragment;
+//                        fragmentTransaction.show(mineFragment).commit();
+//                        mCurrentFragment = mineFragment;
+                        fragmentTransaction.show(chartFragment).commit();
+                        mCurrentFragment = chartFragment;
                         ToastUtil.showMsg(MainActivity.this,"tag3");
                         break;
                 }
             }
         });
-
     }
+
 
     private void hideFragment(FragmentTransaction fragmentTransaction){
         if(homeFragment != null){
@@ -191,8 +225,11 @@ public class MainActivity extends BaseActivity {
         if(mainFragment != null){
             fragmentTransaction.hide(mainFragment);
         }
-        if(mineFragment != null){
-            fragmentTransaction.hide(mineFragment);
+//        if(mineFragment != null){
+//            fragmentTransaction.hide(mineFragment);
+//        }
+        if(chartFragment != null){
+            fragmentTransaction.hide(chartFragment);
         }
     }
 
@@ -205,15 +242,17 @@ public class MainActivity extends BaseActivity {
             @Override
             public void run() {
                 mBluetoothAdapter.stopLeScan(scanCallback);
-                Log.d(TAG,"5s");
+                Log.d(TAG,"7s");
                 if(!flag_scan_succeed){
+                    TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
+                    mTvError.setVisibility(View.VISIBLE);
+                    ToastUtil.showMsg(MainActivity.this,"未找到手环设备，请检查");
                     Log.d(TAG,"scan fail");
-                    //mTvNotFindBle.setVisibility(View.VISIBLE);
                 }
             }
         };
         mBluetoothAdapter.startLeScan(scanCallback);
-        handler.postDelayed(runnable,5000);
+        handler.postDelayed(runnable,7000);
     }
 
 
@@ -244,15 +283,9 @@ public class MainActivity extends BaseActivity {
 
 
     private void connectBLE(BluetoothDevice bluetoothDevice){
-        //mTvNotFindBle.setVisibility(View.INVISIBLE);
         handler.removeCallbacks(runnable);
         mBluetoothAdapter.stopLeScan(scanCallback);
 
-//        addressMAC = bluetoothDevice.getAddress();
-//        if(flag_rememberMac){
-//            mEditor.putString("MACAddress",addressMAC);
-//            mEditor.apply();
-//        }
         if(flag_finishScan && flag_rememberDevice){
             mEditor.putString("DeviceMac",DeviceMacIntent);
             mEditor.putString("DeviceName",DeviceNameIntent);
@@ -274,6 +307,7 @@ public class MainActivity extends BaseActivity {
         } else {
             mBluetoothGatt = bluetoothDevice.connectGatt(MainActivity.this,
                     true, gattCallback);
+            flag_gatt = true;
         }
     }
 
@@ -371,13 +405,6 @@ public class MainActivity extends BaseActivity {
 
             TextView mTvUpdateStep = homeFragment.getView().findViewById(R.id.tv_updateStep);
             mTvUpdateStep.setText(dataBle);
-
-//            if(mCurrentFragment == homeFragment){
-//                mTvUpdateStep = homeFragment.getView().findViewById(R.id.tv_updateStep);
-//                mTvUpdateStep.setText(dataBle);
-//            }else{
-//                //broadcast
-//            }
         }
     };
 
@@ -399,32 +426,30 @@ public class MainActivity extends BaseActivity {
         return sb.toString();
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        //mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.content_container);
-//        Log.d("fragment",String.valueOf(mCurrentFragment));
-//        if(mCurrentFragment != homeFragment){
-//            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-//            hideFragment(fragmentTransaction);
-//            fragmentTransaction.show(homeFragment).commit();
-//            mBottomBar.selectTabWithId(R.id.tab1);
-//            return;
-//        }else{
-//            moveTaskToBack(true);
-//        }
-//        super.onBackPressed();
-//    }
-
+    @Override
+    protected void onDestroy() {
+        if(flag_gatt){
+            mBluetoothGatt.disconnect();
+            mBluetoothGatt.close();
+        }
+        if(dataBle != null){
+            mEditor.putString("StepLastTime",dataBle);
+            mEditor.apply();
+        }
+        super.onDestroy();
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if(mCurrentFragment != homeFragment){
+                BleAdapter.selectedPosition = -1;
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 hideFragment(fragmentTransaction);
                 fragmentTransaction.show(homeFragment).commit();
                 mBottomBar.selectTabWithId(R.id.tab1);
             }else{
+                BleAdapter.selectedPosition = -1;
                 moveTaskToBack(true);
             }
             return true;
