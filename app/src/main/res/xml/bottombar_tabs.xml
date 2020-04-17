@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tabs xmlns:android="http://schemas.android.com/apk/res/android">
     <tab
+        icon="@drawable/bar_home"
         id="@+id/tab1"
-        title="tab1" />
+        title="主页" />
     <tab
+        icon="@drawable/bar_chart"
         id="@+id/tab2"
-        title="tab2" />
+        title="图表"/>
     <tab
+        icon="@drawable/bar_running"
         id="@+id/tab3"
-        title="tab3" />
+        title="训练" />
+    <tab
+        icon="@drawable/bar_friend"
+        id="@+id/tab4"
+        title="好友" />
+    <tab
+        icon="@drawable/bar_mine"
+        id="@+id/tab5"
+        title="我" />
 </tabs>

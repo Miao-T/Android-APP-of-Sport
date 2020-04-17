@@ -3,21 +3,25 @@
     android:id="@+id/big_window_layout"
     android:layout_width="200dip"
     android:layout_height="100dip"
-    android:background="@color/colorGray"
     android:orientation="vertical">
 
     <Button
         android:id="@+id/btn_close"
         android:layout_width="100dip"
-        android:layout_height="40dip"
+        android:layout_height="35dip"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="12dip"
-        android:text="关闭悬浮窗"/>
+        android:background="#50FFFF99"
+        android:text="关闭悬浮窗"
+        android:textColor="@color/colorBlack"/>
 
     <Button
         android:id="@+id/btn_back"
         android:layout_width="100dip"
-        android:layout_height="40dip"
+        android:layout_height="35dip"
         android:layout_gravity="center_horizontal"
-        android:text="返回悬浮窗"/>
+        android:background="#50FFFF99"
+        android:text="返回悬浮窗"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/colorBlack"/>
 </LinearLayout>

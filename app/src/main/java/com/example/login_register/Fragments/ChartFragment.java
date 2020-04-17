@@ -1,5 +1,6 @@
 package com.example.login_register.Fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -35,6 +36,8 @@ import java.util.List;
 
 import cn.smssdk.gui.IdentifyNumPage;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class ChartFragment extends Fragment{
     private final static String TAG = "chart";
     private RadioGroup mRgDate;
@@ -43,9 +46,13 @@ public class ChartFragment extends Fragment{
     private Button mBtnLeft;
     private Button mBtnRight;
     private List list;
+    private String loginName;
     private int year,month,day,week;
     private String dateToday,weekToday,weekCheck;
     private int flag_date = 1;
+
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
     @Nullable
     @Override
@@ -64,37 +71,25 @@ public class ChartFragment extends Fragment{
         mBtnLeft = view.findViewById(R.id.btn_choiceLeft);
         mBtnRight = view.findViewById(R.id.btn_choiceRight);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DBConnection.DriverConnection();
+            }
+        }).start();
+        mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+        loginName = mSharedPreferences.getString("RememberName",null);
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date(System.currentTimeMillis());
+        final Date date = new Date(System.currentTimeMillis());
         dateToday = simpleDateFormat.format(date);
         mTvDate.setText(dateToday);
         weekToday = WeekUtil.getWeek(dateToday);
         Log.d(TAG,dateToday + weekToday);
 
         ChoiceDate();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                DBConnection.DriverConnection();
-                list = DBConnection.ReadStep("2020-04-16","t");
-                for(int i = 0; i < list.size(); i++){
-                    Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
-                }
-                DrawChart();
-            }
-        }).start();
-
-//        Handler handler = new Handler();
-//        Runnable runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.d("DB_tag","drawChart");
-//                DrawChart();
-//            }
-//        };
-//        handler.postDelayed(runnable,3000);
-
+        ReadFromDB1();
     }
 
     private void ChoiceDate(){
@@ -107,6 +102,7 @@ public class ChartFragment extends Fragment{
                     //每日
                     mTvDate.setTextSize(30);
                     mTvDate.setText(dateToday);
+                    ReadFromDB1();
                 }else if(radioButton.getText().equals("每周")){
                     flag_date = 2;
                     //每周
@@ -122,11 +118,13 @@ public class ChartFragment extends Fragment{
                         mTvDate.setTextSize(15);
                         mTvDate.setText(weekCheck + " ~ " +dateToday);
                     }
+                    ReadFromDB2();
                 }else{
                     flag_date = 3;
                     //每月
                     mTvDate.setTextSize(30);
                     mTvDate.setText(dateToday.substring(0,7));
+                    ReadFromDB3();
                 }
             }
         });
@@ -142,6 +140,7 @@ public class ChartFragment extends Fragment{
                     String dateAfter = DateUtil.reduceDay(year,month,day);
                     mTvDate.setText(dateAfter);
                     Log.d(TAG,dateAfter);
+                    ReadFromDB1();
                 }else if(flag_date == 2){
                     String dateShow = mTvDate.getText().toString();
                     year = Integer.parseInt(dateShow.substring(0,4));
@@ -158,6 +157,7 @@ public class ChartFragment extends Fragment{
                         String dateAfter = dateAfterStart + " ~ " + dateAfterEnd;
                         mTvDate.setText(dateAfter);
                     }
+                    ReadFromDB2();
                 }else if(flag_date == 3){
                     String dateShow = mTvDate.getText().toString();
                     Log.d(TAG,dateShow);
@@ -166,6 +166,7 @@ public class ChartFragment extends Fragment{
                     String dateAfter = DateUtil.reduceMonth(year,month);
                     mTvDate.setText(dateAfter);
                     Log.d(TAG,dateAfter);
+                    ReadFromDB3();
                 }
             }
         });
@@ -186,6 +187,7 @@ public class ChartFragment extends Fragment{
                         mTvDate.setText(dateAfter);
                         Log.d(TAG,dateAfter);
                     }
+                    ReadFromDB1();
                 }else if(flag_date == 2){
                     String dateShow = mTvDate.getText().toString();
                     int k = Integer.parseInt(weekCheck.substring(8,10)) - 1;
@@ -213,6 +215,7 @@ public class ChartFragment extends Fragment{
                             mTvDate.setText(dateAfter);
                         }
                     }
+                    ReadFromDB2();
                 }else if(flag_date == 3){
                     String dateShow = mTvDate.getText().toString();
                     Log.d(TAG,dateShow);
@@ -226,23 +229,197 @@ public class ChartFragment extends Fragment{
                         mTvDate.setText(dateAfter);
                         Log.d(TAG,dateAfter);
                     }
+                    ReadFromDB3();
                 }
             }
         });
     }
 
-    private void DrawChart(){
+
+    private void ReadFromDB1(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String dateShow = mTvDate.getText().toString().substring(0,10);
+                list = DBConnection.ReadStepHour(dateShow,loginName);
+                DrawChart1();
+            }
+        }).start();
+    }
+
+    private void DrawChart1() {
         barChart.setDrawBorders(true);
         List<BarEntry> barEntries = new ArrayList<>();
-        for(int i = 0; i < list.size(); i++){
-            Log.d("DB_tag",String.valueOf(i));
-            String step = String.valueOf(list.get(i));
-            Log.d("DB_tag","list  " + step);
-            barEntries.add(new BarEntry(i,Float.parseFloat(step)));
+        for (int i = 0; i < 24; i++) {
+            Log.d("drawChart", String.valueOf(i));
+            if(i >= list.size()){
+                barEntries.add(new BarEntry(i,Float.parseFloat("0")));
+            }else{
+                Log.d("drawChart", String.valueOf(list.get(i)));
+                String step = String.valueOf(list.get(i));
+                Log.d("DB_tag","list  " + step);
+                barEntries.add(new BarEntry(i,Float.parseFloat(step)));
+            }
         }
         String name = "步数";
-        BarDataSet barDataSet = new BarDataSet(barEntries,name);
+        BarDataSet barDataSet = new BarDataSet(barEntries, name);
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
     }
-}
+
+//    private void ReadFromDB2(){
+//        list.clear();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                int week = Integer.parseInt(weekToday.substring(4,5));
+//                String dayEnd = mTvDate.getText().toString().substring(13,23);
+//                int weekEnd = Integer.parseInt(WeekUtil.getWeek(dayEnd).substring(4,5));
+//                String dateShow = mTvDate.getText().toString().substring(0,10);
+//                if(weekEnd == 6){
+//                    for(int i = 0; i < 7; i++){
+//                        year = Integer.parseInt(dateShow.substring(0,4));
+//                        month = Integer.parseInt(dateShow.substring(5,7));
+//                        day = Integer.parseInt(dateShow.substring(8,10));
+//                        Log.d("drawChart", "6 " + dateShow);
+//                        Log.d("drawChart","6 "+ DBConnection.ReadStepWeekly(dateShow,loginName));
+//                        list.add(DBConnection.ReadStepWeekly(dateShow,loginName));
+//                        dateShow = DateUtil.addDay(year,month,day);
+//                    }
+//                }else{
+//                    for(int i = 0; i < week; i++){
+//                        year = Integer.parseInt(dateShow.substring(0,4));
+//                        month = Integer.parseInt(dateShow.substring(5,7));
+//                        day = Integer.parseInt(dateShow.substring(8,10));
+//                        Log.d("drawChart", "7 "+ dateShow);
+//                        Log.d("drawChart","7 "+ DBConnection.ReadStepWeekly(dateShow,loginName));
+//                        list.add(DBConnection.ReadStepWeekly(dateShow,loginName));
+//                        dateShow = DateUtil.addDay(year,month,day);
+//                    }
+//                }
+//                DrawChart2();
+//            }
+//        }).start();
+//    }
+
+        private void ReadFromDB2(){
+        list.clear();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int week = Integer.parseInt(weekToday.substring(4,5));
+                String dayEnd = mTvDate.getText().toString().substring(13,23);
+                int weekEnd = Integer.parseInt(WeekUtil.getWeek(dayEnd).substring(4,5));
+                String dateShow = mTvDate.getText().toString().substring(0,10);
+                String sql = "";
+                if(weekEnd == 6){
+                    for(int i = 0; i < 7; i++){
+                        year = Integer.parseInt(dateShow.substring(0,4));
+                        month = Integer.parseInt(dateShow.substring(5,7));
+                        day = Integer.parseInt(dateShow.substring(8,10));
+                        Log.d("drawChart", "6 " + dateShow);
+                        sql = sql + "time LIKE '" + dateShow + "%' OR ";
+                        Log.d("drawChart", "6 " + sql);
+                        dateShow = DateUtil.addDay(year,month,day);
+                    }
+                }else{
+                    for(int i = 0; i < week; i++){
+                        year = Integer.parseInt(dateShow.substring(0,4));
+                        month = Integer.parseInt(dateShow.substring(5,7));
+                        day = Integer.parseInt(dateShow.substring(8,10));
+                        Log.d("drawChart", "7 "+ dateShow);
+                        sql = sql + "time LIKE '" + dateShow + "%' OR ";
+                        Log.d("drawChart", "6 " + sql);
+                        dateShow = DateUtil.addDay(year,month,day);
+                    }
+                }
+                sql = sql.substring(0,sql.length()-3);
+                list = DBConnection.ReadStepWeekly(sql,loginName);
+                DrawChart2();
+            }
+        }).start();
+    }
+
+    private void DrawChart2() {
+        barChart.setDrawBorders(true);
+        List<BarEntry> barEntries = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            Log.d("drawChart", String.valueOf(i));
+            Log.d("drawChart", "drawchart2"+String.valueOf(list.size()));
+            if(i >= list.size()){
+                Log.d("drawChart", "drawchart2 0");
+                barEntries.add(new BarEntry(i,Float.parseFloat("0")));
+            }else{
+                Log.d("drawChart", String.valueOf(list.get(i)));
+                String step = String.valueOf(list.get(i));
+                Log.d("DB_tag","list  " + step);
+                barEntries.add(new BarEntry(i,Float.parseFloat(step)));
+            }
+        }
+        String name = "步数";
+        BarDataSet barDataSet = new BarDataSet(barEntries, name);
+        BarData data = new BarData(barDataSet);
+        barChart.setData(data);
+    }
+
+    private void ReadFromDB3(){
+        list.clear();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String dateShow = mTvDate.getText().toString().substring(0,7);
+                list = DBConnection.ReadStepDaily(dateShow,loginName);
+                DrawChart3();
+            }
+        }).start();
+    }
+
+    private void DrawChart3() {
+        int j= 0;
+        barChart.setDrawBorders(true);
+        List<BarEntry> barEntries = new ArrayList<>();
+        int year = Integer.parseInt(mTvDate.getText().toString().substring(0,4));
+        int month = Integer.parseInt(mTvDate.getText().toString().substring(5,7));
+        if((year%4 == 0 && year%100 != 0 || year%400 == 0) && month == 2){
+            j = 29;
+        }else{
+            switch (month){
+                case 2:
+                    j  = 28;
+                    break;
+                case 1:
+                case 3:
+                case 5:
+                case 7:
+                case 8:
+                case 10:
+                case 12:
+                    j = 31;
+                    break;
+                case 4:
+                case 6:
+                case 9:
+                case 11:
+                        j= 30;
+                        break;
+            }
+        }
+
+        for (int i = 0; i < j; i++) {
+            Log.d("drawChart", String.valueOf(i));
+            if(i >= list.size()){
+                barEntries.add(new BarEntry(i,Float.parseFloat("0")));
+            }else{
+                Log.d("drawChart", String.valueOf(list.get(i)));
+                String step = String.valueOf(list.get(i));
+                Log.d("DB_tag","list  " + step);
+                barEntries.add(new BarEntry(i,Float.parseFloat(step)));
+            }
+        }
+        String name = "步数";
+        BarDataSet barDataSet = new BarDataSet(barEntries, name);
+        BarData data = new BarData(barDataSet);
+        barChart.setData(data);
+    }
+    }
+

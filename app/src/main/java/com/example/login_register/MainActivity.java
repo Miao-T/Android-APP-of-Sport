@@ -8,8 +8,10 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +31,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.login_register.BLE.BleAdapter;
+import com.example.login_register.Broadcast.BroadcastNetworkActivity;
+import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.Fragments.ChartFragment;
 import com.example.login_register.Fragments.HomeFragment;
 import com.example.login_register.Fragments.MainFragment;
@@ -95,15 +99,31 @@ public class MainActivity extends BaseActivity{
     private String DeviceMacIntent;
     private String DeviceNameIntent;
     //SharedPreference里保存的
+    private String LoginName;
     private String DeviceMacSP;
     private String DeviceNameSP;
     public static String dataBle;
 
     public static MainActivity instance;
+
+    private IntentFilter intentFilter;
+    private TimeChangeReceiver timeChangeReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        intentFilter = new IntentFilter();
+        timeChangeReceiver = new MainActivity.TimeChangeReceiver();
+        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        registerReceiver(timeChangeReceiver,intentFilter);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DBConnection.DriverConnection();
+            }
+        }).start();
 
         instance = this;
         mBluetoothManager = (BluetoothManager)getSystemService(BLUETOOTH_SERVICE);
@@ -125,13 +145,12 @@ public class MainActivity extends BaseActivity{
         }
 
         initFragment();
-
     }
 
     private void getData(){
         mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
-        String LoginName = mSharedPreferences.getString("RememberName",null);
+        LoginName = mSharedPreferences.getString("RememberName",null);
         DeviceMacSP = mSharedPreferences.getString("DeviceMac",null);
         DeviceNameSP = mSharedPreferences.getString("DeviceName",null);
 
@@ -160,12 +179,12 @@ public class MainActivity extends BaseActivity{
         mCurrentFragment = new Fragment();
         homeFragment = new HomeFragment();
         mainFragment = new MainFragment();
-        //mineFragment = new MineFragment();
+        mineFragment = new MineFragment();
         chartFragment = new ChartFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.contentContainer,homeFragment)
                 .add(R.id.contentContainer,mainFragment)
-                //.add(R.id.contentContainer,mineFragment)
+                .add(R.id.contentContainer,mineFragment)
                 .add(R.id.contentContainer,chartFragment)
                 .commit();
         mBottomBar = findViewById(R.id.bottomBar);
@@ -206,11 +225,17 @@ public class MainActivity extends BaseActivity{
                         break;
                     case R.id.tab3:
                         hideFragment(fragmentTransaction);
-//                        fragmentTransaction.show(mineFragment).commit();
-//                        mCurrentFragment = mineFragment;
                         fragmentTransaction.show(chartFragment).commit();
                         mCurrentFragment = chartFragment;
                         ToastUtil.showMsg(MainActivity.this,"tag3");
+                        break;
+                    case R.id.tab4:
+                        break;
+                    case R.id.tab5:
+                        hideFragment(fragmentTransaction);
+                        fragmentTransaction.show(mineFragment).commit();
+                        mCurrentFragment = mineFragment;
+                        ToastUtil.showMsg(MainActivity.this,"tag5");
                         break;
                 }
             }
@@ -225,9 +250,9 @@ public class MainActivity extends BaseActivity{
         if(mainFragment != null){
             fragmentTransaction.hide(mainFragment);
         }
-//        if(mineFragment != null){
-//            fragmentTransaction.hide(mineFragment);
-//        }
+        if(mineFragment != null){
+            fragmentTransaction.hide(mineFragment);
+        }
         if(chartFragment != null){
             fragmentTransaction.hide(chartFragment);
         }
@@ -300,7 +325,6 @@ public class MainActivity extends BaseActivity{
             //6.0以上
             mBluetoothGatt = bluetoothDevice.connectGatt(MainActivity.this,
                     true, gattCallback, TRANSPORT_LE);
-            Log.d(TAG,gattCallback + "  is here?");
             flag_gatt = true;
             //TRANSPORT_LE参数是设置传输层模式
             //bluetoothDevice.connectGatt（）方法返回的对象BluetoothGatt,用于读写订阅操作
@@ -426,17 +450,54 @@ public class MainActivity extends BaseActivity{
         return sb.toString();
     }
 
+    class TimeChangeReceiver extends BroadcastReceiver {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(Intent.ACTION_TIME_TICK)){
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        Date date = new Date(System.currentTimeMillis());
+                        String strDate = simpleDateFormat.format(date);
+                        if(strDate.substring(14,16).equals("23") && !strDate.substring(11,13).equals("00")){
+                            //整小时存入该小时的步数
+                            int totalStep = DBConnection.ReadLastStep(LoginName,strDate.substring(0,10));
+                            Log.d("BLEtimer",String.valueOf(totalStep));
+                            String nowStep = String.valueOf(Integer.parseInt(dataBle)-totalStep);
+                            Log.d("BLEtimer",nowStep);
+                            DBConnection.AutoInsertStep(strDate,nowStep,LoginName,"0");
+                            ToastUtil.showMsg(MainActivity.this,"整小时");
+                        }else if(strDate.substring(11,13).equals("00") && strDate.substring(14,16).equals("00")){
+                            //0点存入初始步数0
+                            mEditor.putString("Step","0");
+                            mEditor.apply();
+                            DBConnection.AutoInsertStep(strDate,"0",LoginName,"0");
+                            ToastUtil.showMsg(MainActivity.this,"0点");
+                        }else if(strDate.substring(11,13).equals("23") && strDate.substring(14,16).equals("59")){
+                            //23:59存入当天总步数
+                            DBConnection.AutoInsertStep(strDate,dataBle,LoginName,"1");
+                            ToastUtil.showMsg(MainActivity.this,"当天步数已上传至云");
+                        }
+                    }
+                }).start();
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
         if(flag_gatt){
             mBluetoothGatt.disconnect();
             mBluetoothGatt.close();
         }
-        if(dataBle != null){
+        //if(!dataBle.equals("null")){
             mEditor.putString("StepLastTime",dataBle);
             mEditor.apply();
-        }
+            Log.d("DB_tag",dataBle);
+        //}
         super.onDestroy();
+        unregisterReceiver(timeChangeReceiver);
     }
 
     @Override

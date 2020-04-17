@@ -1,20 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_marginTop="20dp"
-    android:padding="10dp">
+    android:padding="15dp"
+    android:layout_marginTop="20dp">
 
-    <EditText
-        android:id="@+id/et_ascii"
+    <LinearLayout
+        android:id="@+id/layout_1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Ascii"/>
-    <TextView
-        android:id="@+id/tv_number"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="转码结果"/>
+        android:layout_height="60dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="账户:"
+            android:textSize="20sp"
+            android:textColor="@color/colorBlack"/>
+        <EditText
+            android:id="@+id/et_accountForget"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:hint="Username/TelephoneNumber"
+            android:maxLines="1"/>
+    </LinearLayout>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/layout_2"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:layout_below="@id/layout_1">
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="验证码:"
+            android:textSize="20sp"
+            android:textColor="@color/colorBlack" />
+        <EditText
+            android:id="@+id/et_CodeForget"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:maxLines="1" />
+        <Button
+            android:id="@+id/btn_get_message_Forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="获取验证码"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_confirm_Forget"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/layout_2"
+        android:text="确定"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:textSize="20sp" />
+
+
+</RelativeLayout>

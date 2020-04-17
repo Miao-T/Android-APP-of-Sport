@@ -13,7 +13,6 @@ public class TimerBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if(action.equals(Intent.ACTION_TIME_TICK)){
             Log.d("BLEtimer","time change ok");
-
         }
     }
 }

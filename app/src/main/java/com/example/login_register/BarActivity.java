@@ -50,22 +50,24 @@ public class BarActivity extends BaseActivity {
             @Override
             public void run() {
                 DBConnection.DriverConnection();
-                list = DBConnection.ReadStep("2020-04-16","t");
+                DBConnection.ReadStepHour("2020-04","lindidi");
+                DrawChart();
+                //list = DBConnection.ReadStep("2020-04-16","t");
 //                for(int i = 0; i < list.size(); i++){
 //                    Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
 //                }
             }
         }).start();
 
-        Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Log.d("DB_tag","drawChart");
-                DrawChart();
-            }
-        };
-        handler.postDelayed(runnable,3000);
+//        Handler handler = new Handler();
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                Log.d("DB_tag","drawChart");
+//                DrawChart();
+//            }
+//        };
+//        handler.postDelayed(runnable,3000);
 
 //        barChart.setDrawBorders(true);
 //        //设置数据
@@ -85,12 +87,16 @@ public class BarActivity extends BaseActivity {
     private void DrawChart(){
         barChart.setDrawBorders(true);
         List<BarEntry> barEntries = new ArrayList<>();
-        for(int i = 0; i < list.size(); i++){
-            //barEntries.add(new BarEntry(i, (float) (Math.random()) * 80));
+        for(int i = 0; i < 30; i++){
             Log.d("DB_tag",String.valueOf(i));
-            String step = String.valueOf(list.get(i));
-            Log.d("DB_tag","list  " + step);
-            barEntries.add(new BarEntry(i,Integer.parseInt(step)));
+            Log.d("DB_tag",String.valueOf(list.get(i)));
+            if(list.get(i).equals("0")){
+                barEntries.add(new BarEntry(i,Float.parseFloat("0")));
+            }else{
+                String step = String.valueOf(list.get(i));
+                Log.d("DB_tag","list  " + step);
+                barEntries.add(new BarEntry(i,Float.parseFloat(step)));
+            }
         }
         String name = "步数";
         BarDataSet barDataSet = new BarDataSet(barEntries,name);

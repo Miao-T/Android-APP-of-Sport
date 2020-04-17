@@ -36,11 +36,11 @@ import java.util.List;
 
 public class RegisterActivity extends BaseActivity implements View.OnClickListener{
 
-    private EditText mUsername, mCountry, mPhoneNumber,mEmailAddress;
+    private EditText mUsername, mCountry, mPhoneNumber;
     private EditText mPassword1, mPassword2;
-    private TextView mUsernameText, mPhoneText, mEmailText, mPsdText, mPsdMatchText;
+    private TextView mUsernameText, mPhoneText, mPsdText, mPsdMatchText;
     private Button mConfirm, mBack;
-    private CheckBox mPsdHide;
+    private CheckBox mPsdHide,mPsdHide2;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private boolean mUsernameResult = false, mPhoneResult = false, mPsdResult = false, mPsdMatchResult = false;
@@ -73,6 +73,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         LitePal.initialize(this);
         TextListener();
         HidePsdUtil.ShowOrHide(mPsdHide,mPassword1);
+        HidePsdUtil.ShowOrHide(mPsdHide2,mPassword2);
     }
 
     @Override
@@ -104,7 +105,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         mUsername = findViewById(R.id.et_username);
         mCountry = findViewById(R.id.et_country);
         mPhoneNumber = findViewById(R.id.et_telephone);
-        mEmailAddress = findViewById(R.id.et_email);
         mPassword1 = findViewById(R.id.et_psd1);
         mPassword2 = findViewById(R.id.et_psd2);
         mUsernameText = findViewById(R.id.name_Text);
@@ -112,6 +112,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         mPsdText = findViewById(R.id.psd_Text);
         mPsdMatchText = findViewById(R.id.psd_match_Text);
         mPsdHide = findViewById(R.id.cb_hide);
+        mPsdHide2 = findViewById(R.id.cb_hide2);
         mConfirm = findViewById(R.id.btn_confirm);
         mBack = findViewById(R.id.btn_back);
 
@@ -148,11 +149,10 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                             String phoneNumber = mPhoneNumber.getText().toString().trim();
                             String phoneCountry = mCountry.getText().toString().trim();
                             String phoneNum = phoneCountry + phoneNumber;
-                            String emailAddress = mEmailAddress.getText().toString().trim();
                             String psd1 = mPassword1.getText().toString().trim();
                             String psd2 = mPassword2.getText().toString().trim();
                             String psdMD5 = MD5Util.encrypt(psd1);
-                            DBConnection.RegisterAccount(username,phoneNum,emailAddress,psdMD5,registerDate);
+                            DBConnection.RegisterAccount(username,phoneNum,psdMD5,registerDate);
                             DBConnection.CreateTable(username);
                             //恭喜您成为第N个用户
                         }

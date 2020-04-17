@@ -195,6 +195,7 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
                     ToastUtil.showMsg(LoginMessageActivity.this,"验证码输入正确");
                     Intent intent = new Intent(LoginMessageActivity.this,MainActivity.class);
                     startActivity(intent);
+                    finish();
                 }else if(event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
                     Log.d("SMSSDK","succeed");
                 }

@@ -83,36 +83,6 @@
         <TextView
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="邮箱:"
-            android:textSize="20sp"
-            android:textColor="@color/colorBlack"
-            android:textAllCaps="false"
-            android:layout_gravity="center_vertical"/>
-        <EditText
-            android:id="@+id/et_email"
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:hint="EmailAddress"
-            android:maxLines="1"/>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/email_Text"
-        android:layout_width="match_parent"
-        android:layout_height="15dp"
-        android:text="@string/email_reminder"
-        android:textSize="12sp"
-        android:layout_marginLeft="105dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
             android:text="密码："
             android:textSize="20sp"
             android:textColor="@color/colorBlack"
@@ -163,6 +133,11 @@
             android:hint="Confirm Password"
             android:maxLines="1"
             android:inputType="textPassword"/>
+        <CheckBox
+            android:id="@+id/cb_hide2"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:button="@drawable/password_box"/>
     </LinearLayout>
 
     <TextView

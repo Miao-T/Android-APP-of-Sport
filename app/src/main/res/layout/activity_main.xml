@@ -19,5 +19,5 @@
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         app:bb_tabXmlResource="@xml/bottombar_tabs"
-        app:bb_behavior="shifting"/>
+        app:bb_behavior="underNavbar"/>
 </RelativeLayout>

@@ -29,6 +29,7 @@ public class DBConnection implements ReadData {
     private static final String password = "DidideMiao531";
     private static boolean result;
 
+
     /**
      * 加载驱动
     * */
@@ -45,15 +46,15 @@ public class DBConnection implements ReadData {
     /**
      * 注册账号
      * */
-    public static void RegisterAccount(String name,String phoneNum,String email,String psd,String registerDate){
+    public static void RegisterAccount(String name,String phoneNum,String psd,String registerDate){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
 //            String sql = "INSERT INTO userInfo(userId,userName) VALUES ('31116202','zgd')";
             //String sql = "INSERT INTO demo(id,name) VALUES ('"+id+"','"+name+"')";
-            String sql = "INSERT INTO userInfo(userName,phoneNumber,email,password,registerDate) " +
-                    "VALUES ('"+name+"','"+phoneNum+"','"+email+"','"+psd+"','"+registerDate+"')";
+            String sql = "INSERT INTO userInfo(userName,phoneNumber,password,registerDate) " +
+                    "VALUES ('"+name+"','"+phoneNum+"','"+psd+"','"+registerDate+"')";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -80,7 +81,7 @@ public class DBConnection implements ReadData {
             Log.d("DB_tag","连接数据库成功！！！");
             //time datetime PRIMARY KEY,
             String tableName = "t" + name;
-            String sql = "CREATE TABLE "+tableName+"(id int AUTO_INCREMENT PRIMARY KEY,time datetime NOT NULL,stepData int(50) NOT NULL)";
+            String sql = "CREATE TABLE "+tableName+"(id int AUTO_INCREMENT PRIMARY KEY,time datetime NOT NULL,stepData varchar(50) NOT NULL,state varchar(5) NOT NULL)";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -212,20 +213,81 @@ public class DBConnection implements ReadData {
     }
 
     /**
-     * 模糊查询步数
+     * 每小时自动存步数
     * */
-    public static List ReadStep(String time,String tableName){
+    public static void AutoInsertStep(String date,String step,String name,String state){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String tableName = "t" + name;
+            String sql = "INSERT INTO "+tableName+"(time,stepData,state) VALUES ('"+date+"','"+step+"','"+state+"')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 读取并计算之前的总步数
+     * */
+    public static Integer ReadLastStep(String name,String time){
+        Connection connection = null;
+        Integer totalStep = 0;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String tableName = "t" + name;
+            String exactTime = time + "%";
+            //String sql = "SELECT stepData FROM "+name+" ORDER by id DESC limit 1";
+            String sql = "SELECT stepData FROM "+tableName+" WHERE time LIKE '"+exactTime+"' AND state = '0'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            totalStep = 0;
+            while (resultSet.next()){
+                String step = resultSet.getString("stepData");
+                totalStep = Integer.parseInt(step) + totalStep;
+                Log.d("DB_tag1",step);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return totalStep;
+    }
+
+    /**
+     * 模糊查询每小时步数 ———每日
+     * */
+    public static List ReadStepHour(String time,String name){
         Connection connection = null;
         List stepList = new ArrayList();
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String exactTime= time + "%";
-            String sql = "SELECT stepData FROM "+tableName+" WHERE time LIKE '"+exactTime+"'";
+            String exactTime = time + "%";
+            String tableName = "t" + name;
+            String sql = "SELECT stepData FROM "+tableName+" WHERE time LIKE '"+exactTime+"' AND state = '0'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
-                int step = resultSet.getInt("stepData");
+                String step = resultSet.getString("stepData");
                 Log.d("DB_tag",String.valueOf(step));
                 stepList.add(step);
             }
@@ -243,15 +305,113 @@ public class DBConnection implements ReadData {
         return stepList;
     }
 
+    /**
+     * 模糊查询每日步数 —— 每月
+     * */
+    public static List ReadStepDaily(String time,String name){
+        Connection connection = null;
+        List stepList = new ArrayList();
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String exactTime = time + "%";
+            String tableName = "t" + name;
+            String sql = "SELECT stepData FROM "+tableName+" WHERE time LIKE '"+exactTime+"' AND state = '1'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                String step = resultSet.getString("stepData");
+                Log.d("DB_tag",String.valueOf(step));
+                stepList.add(step);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return stepList;
+    }
 
+    /**
+     * 模糊查询每日步数 —— 每周
+     * */
+//    public static String ReadStepWeekly(String time,String name){
+//        Connection connection = null;
+//        String weekStep = null;
+//        try{
+//            connection = DriverManager.getConnection(url,userName,password);
+//            Log.d("DB_tag","连接数据库成功！！！");
+//            String exactTime = time + "%";
+//            String tableName = "t" + name;
+//            String sql = "SELECT stepData FROM "+tableName+" WHERE time LIKE '"+exactTime+"' AND state = '1'";
+//            PreparedStatement ps = connection.prepareStatement(sql);
+//            ResultSet resultSet = ps.executeQuery();
+//            while (resultSet.next()){
+//                String step = resultSet.getString("stepData");
+//                Log.d("DB_tag",String.valueOf(step));
+//                    weekStep = step;
+//            }
+//        }catch (Exception e){
+//            weekStep = "0";
+//            e.printStackTrace();
+//        }finally {
+//            if(connection != null){
+//                try{
+//                    connection.close();
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        return weekStep;
+//    }
 
-    public static void InsertStep(String date,String step){
+    public static List ReadStepWeekly(String sqlTime,String name){
+        Connection connection = null;
+        List stepList = new ArrayList();
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String tableName = "t" + name;
+            //String sql = "SELECT stepData FROM "+tableName+" WHERE time LIKE '"+exactTime+"' AND state = '1'";
+            String sql = "SELECT stepData FROM "+tableName+" WHERE "+sqlTime+"AND state = '1'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                String step = resultSet.getString("stepData");
+                Log.d("DB_tag",String.valueOf(step));
+                stepList.add(step);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return stepList;
+    }
+    /**
+     * **********************************************************************
+    * */
+    public static void DeleteStep(String name){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String dateInsert = "2020-03-01" + date + ":00:00";
-            String sql = "INSERT INTO tlindidi(time,stepData) VALUES ('"+dateInsert+"','"+step+"')";
+            String tableName = "t" + name;
+            //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
+            String sql = "DELETE FROM "+tableName+" WHERE state = '2'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -267,13 +427,42 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static void Drop(String name){
+    public static void Table() {
         Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(url, userName, password);
+            Log.d("DB_tag", "连接数据库成功！！！");
+            //time datetime PRIMARY KEY,
+            String sql = "CREATE TABLE t(id int AUTO_INCREMENT PRIMARY KEY,time datetime NOT NULL,stepData varchar(50) NOT NULL,state varchar(5) NOT NULL)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void InsertStep(String date){
+        Connection connection = null;
+        String sql;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String TableName = name;
-            String sql = "DROP TABLE "+TableName+"";
+            String dateInsert = "2020-04-" + date + " 00:00:00";
+            if(Integer.parseInt(date)%3 == 0){
+                sql = "INSERT INTO tlindidi(time,stepData,state) VALUES ('"+dateInsert+"','50','1')";
+            }else if(Integer.parseInt(date)%3 == 1){
+                sql = "INSERT INTO tlindidi(time,stepData,state) VALUES ('"+dateInsert+"','100','1')";
+            }else{
+                sql = "INSERT INTO tlindidi(time,stepData,state) VALUES ('"+dateInsert+"','80','1')";
+            }
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -289,13 +478,12 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static void InsertData(){
+    public static void Drop(){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-//            String sql = "INSERT INTO userInfo(userId,userName) VALUES ('31116202','zgd')";
-            String sql = "INSERT INTO t(time,stepData) VALUES ('2020-04-13 13:13:00','50')";
+            String sql = "DROP TABLE t";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -310,6 +498,7 @@ public class DBConnection implements ReadData {
             }
         }
     }
+
 
     public static void Delete(){
         Connection connection = null;
@@ -317,7 +506,7 @@ public class DBConnection implements ReadData {
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
             //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
-            String sql = "DELETE FROM t WHERE stepData = '50'";
+            String sql = "DELETE FROM tlindidi WHERE stepData = '3' OR stepData = '4' OR stepData = 'null'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -354,39 +543,5 @@ public class DBConnection implements ReadData {
         }
     }
 
-    public static boolean CheckNameRegistered(String name){
-        Connection connection = null;
-        try{
-            connection = DriverManager.getConnection(url,userName,password);
-            Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "SELECT password FROM userInfo WHERE name = '"+name+"'";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()){
-                String psd = resultSet.getString("password");
-                //String Name = resultSet.getString("userName");
-                Log.d("DB_tag",psd);
-                if(psd.equals("null")){
-                    result = true;
-                    //无重名
-                }else{
-                    result = false;
-                    //已有
-                    break;
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null){
-                try {
-                    connection.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-        return result;
-    }
 
 }

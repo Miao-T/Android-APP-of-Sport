@@ -1,6 +1,7 @@
 package com.example.login_register.Fragments;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,11 +19,16 @@ import com.example.login_register.R;
 import com.example.login_register.Service.FloatWindowService;
 import com.example.login_register.Utils.ActivityCollector;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class HomeFragment extends Fragment {
 
     private TextView mTvUpdateStep;
     private TextView mTvError;
     private Button mBtnFloatBle;
+
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
     @Nullable
     @Override
@@ -39,6 +45,9 @@ public class HomeFragment extends Fragment {
         mTvError = view.findViewById(R.id.tv_error);
         mBtnFloatBle = view.findViewById(R.id.btn_floatBle);
         mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+        mTvUpdateStep.setText("- -");
 
         mBtnFloatBle.setOnClickListener(new View.OnClickListener() {
             @Override

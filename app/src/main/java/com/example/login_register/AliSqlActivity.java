@@ -59,8 +59,7 @@ public class AliSqlActivity extends BaseActivity{
                 @Override
                     public void run() {
                     String date = mEtId.getText().toString();
-                    String step = mEtName.getText().toString();
-                    DBConnection.InsertStep(date,step);
+                    DBConnection.InsertStep(date);
                 }
             }).start();
             }
@@ -72,7 +71,7 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DBConnection.Delete();
+
                     }
                 }).start();
             }
@@ -84,8 +83,7 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DBConnection.DriverConnection();
-                        DBConnection.UpdateData();
+
                     }
                 }).start();
             }
@@ -98,22 +96,7 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        List list = new ArrayList();
-                        //list = DBConnection.ReadStep();
-                        for(int i = 0; i < list.size(); i++){
-                            Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
-                        }
-//                        DBConnection.DriverConnection();
-//                        String Name = mEtName.getText().toString();
-//                        ReadData readData = new DBConnection();
-//                        EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(Name);
-//                        userInfo.entrySet().iterator();
-//                        String id = String.valueOf(userInfo.get(ReadData.UserInfoData.id));
-//                        String registerTime = String.valueOf(userInfo.get(ReadData.UserInfoData.registerTime));
-//                        Log.d("DB_tag",id + "  " + registerTime);
 
-//                        DBConnection.DriverConnection();
-//                        DBConnection.CheckNameRegistered(Name);
                     }
                 }).start();
             }
@@ -125,9 +108,7 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DBConnection.DriverConnection();
-                        String Name = mEtName.getText().toString();
-                        DBConnection.CreateTable(Name);
+
                     }
                 }).start();
             }
@@ -139,20 +120,11 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        String Name = mEtName.getText().toString();
-                        DBConnection.DriverConnection();
-                        DBConnection.Drop(Name);
+
                     }
                 }).start();
             }
         });
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                String Name = mEtName.getText().toString();
-//                int Id = Integer.parseInt(mEtId.getText().toString());
-//                DBConnection.link(Id,Name);
-//            }
-//        }).start();
+
     }
 }
