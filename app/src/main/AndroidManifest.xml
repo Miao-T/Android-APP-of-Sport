@@ -26,7 +26,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DeviceActivity"></activity>
+        <activity android:name=".Friend.FriendPKActivity"></activity>
+        <activity android:name=".DeviceActivity" />
         <activity android:name=".Broadcast.BroadcastNetworkActivity" />
         <activity android:name=".BLE.ScanBLEActivity" />
         <activity android:name=".AlterUserInfoActivity" />
@@ -64,7 +65,15 @@
             android:name="Mob-AppSecret"
             android:value="bc2ceaffdc0865040b0d76cd247508cb" />
 
-        <activity android:name=".ForgetPsdActivity" />
+        <activity android:name=".ForgetPsdActivity">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
         <activity android:name=".LoginMessageActivity" />
         <activity android:name=".LitePalActivity" />
         <activity

@@ -372,20 +372,25 @@ public class DBConnection implements ReadData {
 //        return weekStep;
 //    }
 
-    public static List ReadStepWeekly(String sqlTime,String name){
+    public static List ReadStepWeekly(String startDay,String sqlTime,String name){
         Connection connection = null;
         List stepList = new ArrayList();
+        List dayList = new ArrayList();
+        List list = new ArrayList();
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
             String tableName = "t" + name;
             //String sql = "SELECT stepData FROM "+tableName+" WHERE time LIKE '"+exactTime+"' AND state = '1'";
-            String sql = "SELECT stepData FROM "+tableName+" WHERE "+sqlTime+"AND state = '1'";
+            String sql = "SELECT stepData,time FROM "+tableName+" WHERE "+sqlTime+"AND state = '1'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
                 String step = resultSet.getString("stepData");
-                Log.d("DB_tag",String.valueOf(step));
+                String day = resultSet.getString("time");
+                Log.d("DB_tag","week" + String.valueOf(step));
+                Log.d("DB_tag","week" + String.valueOf(day));
+                dayList.add(day);
                 stepList.add(step);
             }
         }catch (Exception e){
@@ -399,19 +404,191 @@ public class DBConnection implements ReadData {
                 }
             }
         }
-        return stepList;
+        int k = 7 - stepList.size();
+        Log.d("DB_tag","startDay" + startDay);
+        Log.d("DB_tag",String.valueOf(k));
+        Log.d("DB_tag",String.valueOf(dayList.get(0)));
+        if(!dayList.get(0).equals(startDay) && k != 0){
+            for(int i = 0; i < k; i++){
+                list.add("0");
+            }
+            for(int i = k; i < 7; i++){
+                list.add(stepList.get(i));
+            }
+            Log.d("DB_tag","week list");
+            return list;
+        }else{
+            Log.d("DB_tag","week stepList");
+            return stepList;
+        }
     }
-    /**
-     * **********************************************************************
-    * */
-    public static void DeleteStep(String name){
+
+    public static void UpdateData(String psd,String num){
         Connection connection = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String tableName = "t" + name;
+            String sql = "UPDATE userInfo SET password = '"+psd+"' WHERE phoneNumber = '"+num+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * **********************************************************************
+    * */
+
+    public static void AddRequestList(String userA,String userB){
+        Connection connection = null;
+        String sql;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            sql = "INSERT INTO userRequestList(userA,userB,state) VALUES ('"+userA+"','"+userB+"','0')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static String ReadRequestList0(String userB){
+        Connection connection = null;
+        String userA = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String sql = "SELECT userA FROM userRequestList WHERE userB = '"+userB+"' AND state = '0'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                userA = resultSet.getString("userA");
+                Log.d("DB_tag",String.valueOf(userA));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return userA;
+    }
+
+    public static List<String> ReadRequestListYes(String user){
+        Connection connection = null;
+        List<String> list = new ArrayList<>();
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String sql = "SELECT userA,userB FROM userRequestList WHERE userA = '"+user+"' OR userB = '"+user+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                String userA = resultSet.getString("userA");
+                String userB = resultSet.getString("userB");
+                Log.d("DB_tag",userA + " " + userB);
+                if(userA.equals(user)){
+                    list.add(userB);
+                }else if(userB.equals(user)){
+                    list.add(userA);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return list;
+    }
+
+    public static String ReadRequestListNo(String userA){
+        Connection connection = null;
+        String userB = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String sql = "SELECT userB FROM userRequestList WHERE userA = '"+userA+"' AND state = '2'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                userB = resultSet.getString("userB");
+                Log.d("DB_tag",String.valueOf(userA));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return userB;
+    }
+
+    public static void UpdateRequestState(String state,String userA,String userB){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            String sql = "UPDATE userRequestList SET state= '"+state+"' WHERE userA = '"+userA+"' AND userB = '"+userB+"'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+    public static void DeleteStep(){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
             //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
-            String sql = "DELETE FROM "+tableName+" WHERE state = '2'";
+            String sql = "DELETE FROM userRequestList WHERE userA = 'miaobeibei'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){
@@ -507,27 +684,6 @@ public class DBConnection implements ReadData {
             Log.d("DB_tag","连接数据库成功！！！");
             //String sql = "ALTER TABLE userInfo CHANGE userId userId int AUTO_INCREMENT";
             String sql = "DELETE FROM tlindidi WHERE stepData = '3' OR stepData = '4' OR stepData = 'null'";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.execute(sql);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null){
-                try{
-                    connection.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static void UpdateData(){
-        Connection connection = null;
-        try{
-            connection = DriverManager.getConnection(url,userName,password);
-            Log.d("DB_tag","连接数据库成功！！！");
-            String sql = "UPDATE userInfo SET birthday = '2020-5-11' WHERE userName = 'miaobeibei'";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){

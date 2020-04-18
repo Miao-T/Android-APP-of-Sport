@@ -23,6 +23,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,9 +35,11 @@ import com.example.login_register.BLE.BleAdapter;
 import com.example.login_register.Broadcast.BroadcastNetworkActivity;
 import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.Fragments.ChartFragment;
+import com.example.login_register.Fragments.FriendFragment;
 import com.example.login_register.Fragments.HomeFragment;
 import com.example.login_register.Fragments.MainFragment;
 import com.example.login_register.Fragments.MineFragment;
+import com.example.login_register.Friend.FriendAdapter;
 import com.example.login_register.LitePalDatabase.DailyRecord;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Service.FloatWindowService;
@@ -72,6 +75,7 @@ public class MainActivity extends BaseActivity{
     private MainFragment mainFragment;
     private MineFragment mineFragment;
     private ChartFragment chartFragment;
+    private FriendFragment friendFragment;
     private Fragment mCurrentFragment;
 
     private List<BluetoothDevice> mDatas;
@@ -117,7 +121,6 @@ public class MainActivity extends BaseActivity{
         timeChangeReceiver = new MainActivity.TimeChangeReceiver();
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(timeChangeReceiver,intentFilter);
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -181,11 +184,13 @@ public class MainActivity extends BaseActivity{
         mainFragment = new MainFragment();
         mineFragment = new MineFragment();
         chartFragment = new ChartFragment();
+        friendFragment = new FriendFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.contentContainer,homeFragment)
                 .add(R.id.contentContainer,mainFragment)
                 .add(R.id.contentContainer,mineFragment)
                 .add(R.id.contentContainer,chartFragment)
+                .add(R.id.contentContainer,friendFragment)
                 .commit();
         mBottomBar = findViewById(R.id.bottomBar);
 
@@ -230,6 +235,10 @@ public class MainActivity extends BaseActivity{
                         ToastUtil.showMsg(MainActivity.this,"tag3");
                         break;
                     case R.id.tab4:
+                        hideFragment(fragmentTransaction);
+                        fragmentTransaction.show(friendFragment).commit();
+                        mCurrentFragment = friendFragment;
+                        ToastUtil.showMsg(MainActivity.this,"tag4");
                         break;
                     case R.id.tab5:
                         hideFragment(fragmentTransaction);
@@ -255,6 +264,9 @@ public class MainActivity extends BaseActivity{
         }
         if(chartFragment != null){
             fragmentTransaction.hide(chartFragment);
+        }
+        if(friendFragment != null){
+            fragmentTransaction.hide(friendFragment);
         }
     }
 

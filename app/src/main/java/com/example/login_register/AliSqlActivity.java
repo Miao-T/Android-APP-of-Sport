@@ -14,6 +14,7 @@ import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.ActivityCollector;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.ReadData;
+import com.example.login_register.Utils.ToastUtil;
 import com.example.login_register.Utils.WeekUtil;
 
 import java.util.ArrayList;
@@ -58,8 +59,8 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                 @Override
                     public void run() {
-                    String date = mEtId.getText().toString();
-                    DBConnection.InsertStep(date);
+                    DBConnection.AddRequestList("lindidi","qinhui");
+                    //DBConnection.AddRequestList("miaobeibei","lindidi");
                 }
             }).start();
             }
@@ -71,7 +72,9 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-
+                        String userA = DBConnection.ReadRequestList0("lindidi");
+                        Log.d("FriendList",userA);
+                        ToastUtil.showMsg(AliSqlActivity.this,userA);
                     }
                 }).start();
             }
@@ -83,7 +86,7 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-
+                        DBConnection.UpdateRequestState("1","miaobeibei","lindidi");
                     }
                 }).start();
             }
@@ -96,7 +99,10 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-
+                        //String name1 = DBConnection.ReadRequestListYes("miaowa");
+                        String name2 = DBConnection.ReadRequestListNo("miaowa");
+                        //Log.d("FriendList","Yes"+name1);
+                        Log.d("FriendList","No"+name2);
                     }
                 }).start();
             }
@@ -120,7 +126,7 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-
+                        DBConnection.DeleteStep();
                     }
                 }).start();
             }

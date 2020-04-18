@@ -311,6 +311,7 @@ public class ChartFragment extends Fragment{
                 String dayEnd = mTvDate.getText().toString().substring(13,23);
                 int weekEnd = Integer.parseInt(WeekUtil.getWeek(dayEnd).substring(4,5));
                 String dateShow = mTvDate.getText().toString().substring(0,10);
+                String startDay = mTvDate.getText().toString().substring(0,10);
                 String sql = "";
                 if(weekEnd == 6){
                     for(int i = 0; i < 7; i++){
@@ -333,8 +334,9 @@ public class ChartFragment extends Fragment{
                         dateShow = DateUtil.addDay(year,month,day);
                     }
                 }
-                sql = sql.substring(0,sql.length()-3);
-                list = DBConnection.ReadStepWeekly(sql,loginName);
+
+                sql = "(" + sql.substring(0,sql.length()-3) + ")";
+                list = DBConnection.ReadStepWeekly(startDay,sql,loginName);
                 DrawChart2();
             }
         }).start();
@@ -421,5 +423,5 @@ public class ChartFragment extends Fragment{
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
     }
-    }
+}
 
