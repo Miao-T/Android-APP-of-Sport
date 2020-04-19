@@ -472,7 +472,7 @@ public class MainActivity extends BaseActivity{
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         Date date = new Date(System.currentTimeMillis());
                         String strDate = simpleDateFormat.format(date);
-                        if(strDate.substring(14,16).equals("23") && !strDate.substring(11,13).equals("00")){
+                        if(strDate.substring(14,16).equals("00") && !strDate.substring(11,13).equals("00")){
                             //整小时存入该小时的步数
                             int totalStep = DBConnection.ReadLastStep(LoginName,strDate.substring(0,10));
                             Log.d("BLEtimer",String.valueOf(totalStep));
@@ -503,11 +503,11 @@ public class MainActivity extends BaseActivity{
             mBluetoothGatt.disconnect();
             mBluetoothGatt.close();
         }
-        //if(!dataBle.equals("null")){
-            mEditor.putString("StepLastTime",dataBle);
-            mEditor.apply();
-            Log.d("DB_tag",dataBle);
-        //}
+//        if(!dataBle.equals("null")){
+//            mEditor.putString("StepLastTime",dataBle);
+//            mEditor.apply();
+//            Log.d("DB_tag",dataBle);
+//        }
         super.onDestroy();
         unregisterReceiver(timeChangeReceiver);
     }

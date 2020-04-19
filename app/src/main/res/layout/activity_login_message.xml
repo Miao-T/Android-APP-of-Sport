@@ -23,7 +23,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:hint="Username/TelephoneNumber"
+            android:hint="PhoneNumber"
+            android:inputType="number"
             android:maxLines="1"/>
     </LinearLayout>
 
@@ -44,8 +45,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:hint="Password"
-            android:inputType="textPassword"
+            android:hint="Verification Code"
+            android:inputType="number"
             android:maxLines="1" />
         <Button
             android:id="@+id/btn_get_message"
@@ -94,7 +95,6 @@
             android:textAllCaps="false"
             android:layout_marginTop="5dp"
             android:layout_weight="1"/>
-
     </LinearLayout>
 
 </LinearLayout>

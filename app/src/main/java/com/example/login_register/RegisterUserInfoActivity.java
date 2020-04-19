@@ -1,8 +1,11 @@
 package com.example.login_register;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,6 +30,7 @@ import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.GetJsonDataUtil;
 import com.example.login_register.Utils.MonitorText;
 import com.example.login_register.Utils.NetworkListener;
+import com.example.login_register.Utils.ReadData;
 import com.example.login_register.Utils.ToastUtil;
 import com.google.gson.Gson;
 
@@ -43,6 +47,7 @@ import java.util.List;
 public class RegisterUserInfoActivity extends BaseActivity implements View.OnClickListener{
     private static final String TAG = "userInfo_tag";
     private RadioGroup mRgSex;
+    private RadioButton mRb1,mRb2;
     private TextView mTvHeight,mTvWeight,mTvBirthday,mTvAddress,mTvStep;
     private Button mBtnSave;
     private TextView mTvGap;
@@ -59,6 +64,12 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
     private String name;
     private NetworkListener networkListener;
     private boolean flagNetwork;
+    private String flag;
+
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+
+    private String sexSR,heightSR,weightSR,birthdaySR,ageSR,locationSR,targetStepSR;
     /**
      * weight先点就有Bug
     * */
@@ -72,18 +83,43 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
                 DBConnection.DriverConnection();
             }
         }).start();
+        initView();
+        mSharedPreferences =getSharedPreferences("User",MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
 
         Intent intent = getIntent();
-        name = intent.getStringExtra("RegisterName");
+        flag = intent.getStringExtra("flag");
+        if(flag.equals("2")){
+            setTextViewEnableFalse();
+            mTvGap.setText("修改个人信息");
+            name = mSharedPreferences.getString("RememberName",null);
+            sexSR = mSharedPreferences.getString("sex",null);
+            heightSR = mSharedPreferences.getString("height",null);
+            weightSR = mSharedPreferences.getString("weight",null);
+            birthdaySR = mSharedPreferences.getString("birthday",null);
+            locationSR = mSharedPreferences.getString("location",null);
+            targetStepSR = mSharedPreferences.getString("targetStep",null);
+            if(sexSR.equals("1")){
+                mRb2.setChecked(true);
+            }else{
+                mRb1.setChecked(true);
+            }
+            mTvHeight.setText(heightSR + "cm");
+            mTvWeight.setText(weightSR + "kg");
+            mTvBirthday.setText(birthdaySR);
+            mTvAddress.setText(locationSR);
+            mTvStep.setText(targetStepSR);
+        }else{
+            name = intent.getStringExtra("RegisterName");
+        }
+
 
         LitePal.initialize(this);
-        initView();
+
         mBtnSave.setEnabled(false);
         mBtnSave.setClickable(false);
         initJsonData();
         TextWatcher();
-
-//        new MonitorText().SetMonitorText(mBtnSave,mTvHeight,mTvWeight,mTvBirthday,mTvAddress,mTvStep);
 
         mRgSex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -108,6 +144,46 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
         });
     }
 
+    private void setTextViewEnableFalse(){
+        mBtnSave.setVisibility(View.GONE);
+        mRb1.setEnabled(false);
+        mRb1.setClickable(false);
+        mRb2.setEnabled(false);
+        mRb2.setClickable(false);
+        mTvHeight.setEnabled(false);
+        mTvHeight.setClickable(false);
+        mTvWeight.setEnabled(false);
+        mTvWeight.setClickable(false);
+        mTvBirthday.setEnabled(false);
+        mTvBirthday.setClickable(false);
+        mTvAddress.setEnabled(false);
+        mTvAddress.setClickable(false);
+        mTvStep.setEnabled(false);
+        mTvStep.setClickable(false);
+        mRgSex.setEnabled(false);
+        mRgSex.setClickable(false);
+    }
+
+    private void setTextViewEnableTrue(){
+        mBtnSave.setVisibility(View.VISIBLE);
+        mRb1.setEnabled(true);
+        mRb1.setClickable(true);
+        mRb2.setEnabled(true);
+        mRb2.setClickable(true);
+        mTvHeight.setEnabled(true);
+        mTvHeight.setClickable(true);
+        mTvWeight.setEnabled(true);
+        mTvWeight.setClickable(true);
+        mTvBirthday.setEnabled(true);
+        mTvBirthday.setClickable(true);
+        mTvAddress.setEnabled(true);
+        mTvAddress.setClickable(true);
+        mTvStep.setEnabled(true);
+        mTvStep.setClickable(true);
+        mRgSex.setEnabled(true);
+        mRgSex.setClickable(true);
+    }
+
     private void TextWatcher(){
         HeightWatcher();
         WeightWatcher();
@@ -118,6 +194,8 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
 
     private void initView(){
         mRgSex = findViewById(R.id.rg_sex);
+        mRb1 = findViewById(R.id.rb_female);
+        mRb2 = findViewById(R.id.rb_male);
         mTvHeight = findViewById(R.id.tv_height);
         mTvWeight = findViewById(R.id.tv_weight);
         mTvBirthday = findViewById(R.id.tv_birthday);
@@ -125,6 +203,7 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
         mTvStep = findViewById(R.id.tv_targetStep);
         mBtnSave = findViewById(R.id.btn_save_userInfo);
         mTvGap = findViewById(R.id.tv_gap);
+        mTvGap.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
 
         mTvHeight.setOnClickListener(this);
         mTvWeight.setOnClickListener(this);
@@ -176,12 +255,57 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
                 }
                 break;
             case R.id.tv_gap:
-                Ignore();
+                if(mTvGap.getText().toString().equals("跳过")){
+                    Ignore();
+                }else{
+                    setTextViewEnableTrue();
+                    mBtnSave.setEnabled(true);
+                    mBtnSave.setClickable(true);
+                }
                 break;
         }
     }
 
     private void SaveToDatabase(){
+        if(mRb1.isChecked()){
+            sex = 2;
+            //male
+        }else{
+            sex = 1;
+            //female
+        }
+        Log.d("register_tag",name);
+        Log.d("register_tag",String.valueOf(sex));
+        String strHeight = mTvHeight.getText().toString();
+        height = Integer.parseInt(strHeight.substring(0,strHeight.length()-2));
+        Log.d("register_tag",String.valueOf(height));
+        String strWeight = mTvWeight.getText().toString();
+        weight = Double.parseDouble(strWeight.substring(0, strWeight.length() - 2));
+        Log.d("register_tag",String.valueOf(weight));
+        birthday = mTvBirthday.getText().toString();
+        Log.d("register_tag",String.valueOf(birthday));
+        Calendar calender = Calendar.getInstance();
+        yearNow = calender.get(Calendar.YEAR);
+        monthNow = calender.get(Calendar.MONTH)+1;
+        dayNow = calender.get(Calendar.DATE);
+        Log.d("register_tag",String.valueOf(yearNow));
+        yearBirth = Integer.parseInt(birthday.substring(0,4));
+        monthBirth = Integer.parseInt(birthday.substring(5,7));
+        dayBirth = Integer.parseInt(birthday.substring(8,10));
+        age = AgeUtil.getAge(yearNow,yearBirth,monthNow,monthBirth,dayNow,dayBirth);
+        Log.d("register_tag",String.valueOf(age));
+        location = mTvAddress.getText().toString();
+        Log.d("register_tag",location);
+        targetStep = Integer.parseInt(mTvStep.getText().toString());
+        Log.d("register_tag",String.valueOf(targetStep));
+        mEditor.putString("sex",String.valueOf(sex));
+        mEditor.putString("height",String.valueOf(height));
+        mEditor.putString("weight",String.valueOf(weight));
+        mEditor.putString("birthday",birthday);
+        mEditor.putString("age",String.valueOf(age));
+        mEditor.putString("location",String.valueOf(location));
+        mEditor.putString("targetStep",String.valueOf(targetStep));
+        mEditor.apply();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -203,8 +327,13 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
         Log.d(TAG,String.valueOf(age));
         Log.d(TAG,birthday);
         Log.d(TAG,location);
-        Intent intent = new Intent(RegisterUserInfoActivity.this,LoginActivity.class);
-        startActivity(intent);
+        if(mTvGap.getText().toString().equals("跳过")){
+            Intent intent = new Intent(RegisterUserInfoActivity.this,LoginActivity.class);
+            startActivity(intent);
+        }else{
+            ToastUtil.showMsg(RegisterUserInfoActivity.this,"修改成功");
+            setTextViewEnableFalse();
+        }
     }
 
     private void Ignore(){
@@ -442,6 +571,9 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
 
     private void buttonEnable(){
         if(flagSex && flagHeight && flagWeight && flagBirthday && flagLocation && flagStep){
+            mBtnSave.setEnabled(true);
+            mBtnSave.setClickable(true);
+        }else if(mTvGap.getText().toString().equals("修改个人信息")){
             mBtnSave.setEnabled(true);
             mBtnSave.setClickable(true);
         }else{

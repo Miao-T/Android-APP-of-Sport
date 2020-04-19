@@ -108,15 +108,21 @@ public class ChartFragment extends Fragment{
                     //每周
                     mTvDate.setText(dateToday);
                     int i = Integer.parseInt(weekToday.substring(4,5));
-                    for(int j = 0; j < i; j++){
-                        String dateShow = mTvDate.getText().toString();
-                        year = Integer.parseInt(dateShow.substring(0,4));
-                        month = Integer.parseInt(dateShow.substring(5,7));
-                        day = Integer.parseInt(dateShow.substring(8,10));
-                        weekCheck = DateUtil.reduceDay(year,month,day);
-                        Log.d(TAG,weekCheck);
+                    if(i == 7){
                         mTvDate.setTextSize(15);
-                        mTvDate.setText(weekCheck + " ~ " +dateToday);
+                        weekCheck = dateToday;
+                        mTvDate.setText(weekCheck + " ~ " + dateToday);
+                    }else{
+                        for(int j = 0; j < i; j++){
+                            String dateShow = mTvDate.getText().toString();
+                            year = Integer.parseInt(dateShow.substring(0,4));
+                            month = Integer.parseInt(dateShow.substring(5,7));
+                            day = Integer.parseInt(dateShow.substring(8,10));
+                            weekCheck = DateUtil.reduceDay(year,month,day);
+                            Log.d(TAG,weekCheck);
+                            mTvDate.setTextSize(15);
+                            mTvDate.setText(weekCheck + " ~ " +dateToday);
+                        }
                     }
                     ReadFromDB2();
                 }else{
@@ -265,42 +271,8 @@ public class ChartFragment extends Fragment{
         BarDataSet barDataSet = new BarDataSet(barEntries, name);
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
+        //barChart.animateXY(3000,3000);
     }
-
-//    private void ReadFromDB2(){
-//        list.clear();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                int week = Integer.parseInt(weekToday.substring(4,5));
-//                String dayEnd = mTvDate.getText().toString().substring(13,23);
-//                int weekEnd = Integer.parseInt(WeekUtil.getWeek(dayEnd).substring(4,5));
-//                String dateShow = mTvDate.getText().toString().substring(0,10);
-//                if(weekEnd == 6){
-//                    for(int i = 0; i < 7; i++){
-//                        year = Integer.parseInt(dateShow.substring(0,4));
-//                        month = Integer.parseInt(dateShow.substring(5,7));
-//                        day = Integer.parseInt(dateShow.substring(8,10));
-//                        Log.d("drawChart", "6 " + dateShow);
-//                        Log.d("drawChart","6 "+ DBConnection.ReadStepWeekly(dateShow,loginName));
-//                        list.add(DBConnection.ReadStepWeekly(dateShow,loginName));
-//                        dateShow = DateUtil.addDay(year,month,day);
-//                    }
-//                }else{
-//                    for(int i = 0; i < week; i++){
-//                        year = Integer.parseInt(dateShow.substring(0,4));
-//                        month = Integer.parseInt(dateShow.substring(5,7));
-//                        day = Integer.parseInt(dateShow.substring(8,10));
-//                        Log.d("drawChart", "7 "+ dateShow);
-//                        Log.d("drawChart","7 "+ DBConnection.ReadStepWeekly(dateShow,loginName));
-//                        list.add(DBConnection.ReadStepWeekly(dateShow,loginName));
-//                        dateShow = DateUtil.addDay(year,month,day);
-//                    }
-//                }
-//                DrawChart2();
-//            }
-//        }).start();
-//    }
 
         private void ReadFromDB2(){
         list.clear();
@@ -362,6 +334,7 @@ public class ChartFragment extends Fragment{
         BarDataSet barDataSet = new BarDataSet(barEntries, name);
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
+        //barChart.animateXY(3000,3000);
     }
 
     private void ReadFromDB3(){
@@ -422,6 +395,7 @@ public class ChartFragment extends Fragment{
         BarDataSet barDataSet = new BarDataSet(barEntries, name);
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
+        //barChart.animateXY(3000,3000);
     }
 }
 

@@ -13,11 +13,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.login_register.BLE.ScanBLEActivity;
 import com.example.login_register.CloudSQL.DBConnection;
+import com.example.login_register.Friend.FriendAdapter;
 import com.example.login_register.LitePalDatabase.UserInfo;
 import com.example.login_register.Utils.BaseActivity;
 import com.example.login_register.Utils.NetworkListener;
@@ -43,6 +46,7 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
     private Button mBtnLogin;
     private Button mBtnRegister;
     EventHandler eventHandler;
+    Handler handler1;
     private TimeCountUtil mTimeCountUtil;
     private Boolean flag = true;
     private Boolean flagNumber = false;
@@ -51,6 +55,8 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
     private SharedPreferences.Editor mEditor;
     private NetworkListener networkListener;
     private boolean mNetworkResult;
+    private static final int MessageLogin = 1;
+    private String loginName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,14 +112,22 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
             case R.id.btn_get_message:
                 phoneNumber = mEtAccount.getText().toString().trim();
                 CheckPhoneNumber();
-                if(flagNumber){
-                    mTimeCountUtil.start();
-                    SMSSDK.getVerificationCode("86",phoneNumber);
-                    mEtMessageMod.requestFocus();
-                }else{
-                    ToastUtil.showMsg(LoginMessageActivity.this,"该手机号未注册，请先注册");
-                    mEtAccount.setText("  ");
-                }
+                handler1 = new Handler(){
+                    @Override
+                    public void handleMessage(@NonNull Message msg) {
+                        super.handleMessage(msg);
+                        if(msg.what == MessageLogin){
+                            if(flagNumber){
+                                mTimeCountUtil.start();
+                                SMSSDK.getVerificationCode("86",phoneNumber);
+                                mEtMessageMod.requestFocus();
+                            }else{
+                                ToastUtil.showMsg(LoginMessageActivity.this,"该手机号未注册，请先注册");
+                                mEtAccount.setText("");
+                            }
+                        }
+                    }
+                };
                 break;
             case R.id.btn_loginM:
                 mNetworkResult = networkListener.NetWorkState(LoginMessageActivity.this);
@@ -146,11 +160,15 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
                 EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData("",wholeNumber);
                 userInfo.entrySet().iterator();
                 String psdCloud = String.valueOf(userInfo.get(ReadData.UserInfoData.password));
+                loginName = String.valueOf(userInfo.get(ReadData.UserInfoData.userName));
                 if(psdCloud.equals("null")){
                     flagNumber = false;
                 }else{
                     flagNumber = true;
                 }
+                Message message = new Message();
+                message.what = MessageLogin;
+                handler1.sendMessage(message);
             }
         }).start();
     }
@@ -180,20 +198,20 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
             }
             if(result == SMSSDK.RESULT_COMPLETE){
                 if(event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE){
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ReadData readData = new DBConnection();
-                            EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData("",wholeNumber);
-                            userInfo.entrySet().iterator();
-                            String userName = String.valueOf(userInfo.get(ReadData.UserInfoData.userName));
-                            mEditor.putString("RememberName",userName);
-                            mEditor.putBoolean("has_login",true);
-                            mEditor.apply();
-                        }
-                    }).start();
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            ReadData readData = new DBConnection();
+//                            EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData("",wholeNumber);
+//                            userInfo.entrySet().iterator();
+//                            String userName = String.valueOf(userInfo.get(ReadData.UserInfoData.userName));
+//                        }
+//                    }).start();
+                    mEditor.putString("RememberName",loginName);
+                    mEditor.putBoolean("has_login",true);
+                    mEditor.apply();
                     ToastUtil.showMsg(LoginMessageActivity.this,"验证码输入正确");
-                    Intent intent = new Intent(LoginMessageActivity.this,MainActivity.class);
+                    Intent intent = new Intent(LoginMessageActivity.this, ScanBLEActivity.class);
                     startActivity(intent);
                     finish();
                 }else if(event == SMSSDK.EVENT_GET_VERIFICATION_CODE){

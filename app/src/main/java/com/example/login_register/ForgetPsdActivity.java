@@ -52,6 +52,7 @@ public class ForgetPsdActivity extends AppCompatActivity implements View.OnClick
     private Button mBtnChangePsd;
 
     EventHandler eventHandler;
+    Handler handler1;
     private TimeCountUtil mTimeCountUtil;
     private Boolean flag = true;
     private Boolean flagNumber = false;
@@ -63,6 +64,8 @@ public class ForgetPsdActivity extends AppCompatActivity implements View.OnClick
     private String userName;
     private boolean mPsdResult = false, mPsdMatchResult = false;
     private String psdCloud;
+    private static final int MessageLogin = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,23 +136,22 @@ public class ForgetPsdActivity extends AppCompatActivity implements View.OnClick
             case R.id.btn_get_message_Forget:
                 phoneNumber = mEtAccount.getText().toString().trim();
                 CheckPhoneNumber();
-                if(flagNumber){
-                    mTimeCountUtil.start();
-                    SMSSDK.getVerificationCode("86",phoneNumber);
-                    mEtMessageMod.requestFocus();
-                }else{
-                    ToastUtil.showMsg(ForgetPsdActivity.this,"该手机号未注册，请先注册");
-                    mEtAccount.setText("");
-                }
-
-//                Handler handler = new Handler();
-//                Runnable runnable = new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                    }
-//                };
-//                handler.postDelayed(runnable,2000);
+                handler1 = new Handler(){
+                    @Override
+                    public void handleMessage(@NonNull Message msg) {
+                        super.handleMessage(msg);
+                        if(msg.what == MessageLogin){
+                            if(flagNumber){
+                                mTimeCountUtil.start();
+                                SMSSDK.getVerificationCode("86",phoneNumber);
+                                mEtMessageMod.requestFocus();
+                            }else{
+                                ToastUtil.showMsg(ForgetPsdActivity.this,"该手机号未注册，请先注册");
+                                mEtAccount.setText("");
+                            }
+                        }
+                    }
+                };
                 break;
 
             case R.id.btn_confirm_Forget:
@@ -288,17 +290,13 @@ public class ForgetPsdActivity extends AppCompatActivity implements View.OnClick
                 userName = String.valueOf(userInfo.get(ReadData.UserInfoData.userName));
                 Log.d("Psd",psdCloud);
                 if(psdCloud.equals("null")){
-//                    ToastUtil.showMsg(ForgetPsdActivity.this,"该手机号未注册，请先注册");
-//                    mEtAccount.setText("");
-//                    Log.d("Psd","false");
                     flagNumber = false;
                 }else{
-//                    mTimeCountUtil.start();
-//                    SMSSDK.getVerificationCode("86",phoneNumber);
-//                    mEtMessageMod.requestFocus();
-//                    Log.d("Psd","true");
                     flagNumber = true;
                 }
+                Message message = new Message();
+                message.what = MessageLogin;
+                handler1.sendMessage(message);
             }
         }).start();
     }

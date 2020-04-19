@@ -114,10 +114,10 @@ public class SingleOptionsPicker<T> {
                     @Override
                     public void onOptionsSelect(int options1, int options2, int options3, View view) {
                         if (type == 1) {
-                            textView.setText(options1 + 60 + "CM");
+                            textView.setText(options1 + 60 + "cm");
                         } else if (type == 2) {
                             //注意起始数值
-                            textView.setText(options1*0.5 + 30 + "KG");
+                            textView.setText(options1*0.5 + 30 + "kg");
                         }else if(type == 3){
                             textView.setText(options1*500 + 1000 + "步");
                         }

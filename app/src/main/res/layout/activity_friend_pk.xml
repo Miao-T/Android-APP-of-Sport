@@ -1,9 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Friend.FriendPKActivity">
+    tools:context=".Friend.FriendPKActivity"
+    android:padding="20dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/tv_pk_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="50dp"/>
+
+    <LinearLayout
+        android:id="@+id/date_layout_pk"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/tv_pk_name"
+        android:layout_marginTop="20dp">
+        <Button
+            android:id="@+id/btn_choiceLeft_pk"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/button_left"
+            android:gravity="center_vertical"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/tv_date_pk"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@id/btn_choiceLeft"
+            android:gravity="center"
+            android:text=""
+            android:textSize="30sp"
+            android:layout_weight="7"/>
+        <Button
+            android:id="@+id/btn_choiceRight_pk"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/button_right"
+            android:gravity="center_vertical"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/chart_layout_pk"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@id/date_layout_pk"
+        android:layout_marginTop="20dp">
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/bar_chart_pk"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_pk_rate"
+        android:layout_below="@id/chart_layout_pk"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/tv_pk_result"
+        android:layout_below="@id/tv_pk_rate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textSize="30sp"/>
+
+</RelativeLayout>

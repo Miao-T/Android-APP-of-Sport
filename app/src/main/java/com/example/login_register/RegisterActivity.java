@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -47,7 +50,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     private boolean mNetworkResult = false, mRepeatedResult = false;
     private String strName,registerDate;
     private NetworkListener networkListener;
-
+    private Handler handler;
+    private static final int MessageText = 1;
+    private static final int MessageText2 = 2;
 
     /******************
      检验邮箱有效性
@@ -74,6 +79,26 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         TextListener();
         HidePsdUtil.ShowOrHide(mPsdHide,mPassword1);
         HidePsdUtil.ShowOrHide(mPsdHide2,mPassword2);
+
+        handler = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case MessageText:
+                        String username = mUsername.getText().toString().trim();
+                        ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
+                        Intent intent = new Intent(RegisterActivity.this, RegisterUserInfoActivity.class);
+                        intent.putExtra("RegisterName",username);
+                        intent.putExtra("flag","1");
+                        startActivity(intent);
+                        break;
+                    case MessageText2:
+                        ToastUtil.showMsg(RegisterActivity.this, "用户名或手机号已被注册");
+                        break;
+                }
+            }
+        };
     }
 
     @Override
@@ -157,12 +182,20 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                             //恭喜您成为第N个用户
                         }
                     }).start();
-                    ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
-                    Intent intent = new Intent(RegisterActivity.this, RegisterUserInfoActivity.class);
-                    intent.putExtra("RegisterName",username);
-                    startActivity(intent);
+                    Message message = new Message();
+                    message.what = MessageText;
+                    handler.sendMessage(message);
+
+//                    ToastUtil.showMsg(RegisterActivity.this, "账户注册成功");
+//                    Intent intent = new Intent(RegisterActivity.this, RegisterUserInfoActivity.class);
+//                    intent.putExtra("RegisterName",username);
+//                    intent.putExtra("flag","1");
+//                    startActivity(intent);
                 }else{
-                    ToastUtil.showMsg(RegisterActivity.this, "用户名或手机号已被注册");
+                    Message message = new Message();
+                    message.what = MessageText2;
+                    handler.sendMessage(message);
+//                    ToastUtil.showMsg(RegisterActivity.this, "用户名或手机号已被注册");
                 }
             }
         }).start();

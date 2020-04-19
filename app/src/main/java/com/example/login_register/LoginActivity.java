@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.UserManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -13,6 +14,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.example.login_register.BLE.ScanBLEActivity;
 import com.example.login_register.CloudSQL.DBConnection;
@@ -42,6 +45,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private String psdCloud,psdInput,psdMD5Input;
     private NetworkListener networkListener;
     private boolean mNetworkResult;
+    private String userId,userName,registerData,phoneNumber,sex,height,weight,birthday,age,location,targetStep;
+    private Handler handler;
+    private static final int MessageText = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,55 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             }
         }).start();
         rememberPsd();
+
+        handler = new Handler() {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case MessageText:
+                        String nameInput = mEtName.getText().toString().trim();
+                        Log.d("DB_tag", psdCloud);
+                        if (psdCloud.equals("null")) {
+                            ToastUtil.showMsg(LoginActivity.this, "用户名未注册，请先注册");
+                            mCbRememberPsd.setChecked(false);
+                            mEtPassword.setText("");
+                        } else {
+                            if (psdMD5Input.equals(psdCloud)) {
+                                if (mCbRememberPsd.isChecked()) {
+                                    mEditor.putBoolean("is_remember", true);
+                                    mEditor.putString("RememberPsd", psdMD5Input);
+                                } else {
+                                    mEditor.remove("RememberPsd");
+                                    mEditor.putBoolean("is_remember", false);
+                                }
+                                mEditor.putString("RememberName", nameInput);
+                                mEditor.putBoolean("has_login", true);
+                                Log.d("ali",psdCloud+userId+registerData+phoneNumber+sex+height+weight+birthday+age+location+targetStep);
+                                mEditor.putString("userId",userId);
+                                mEditor.putString("registerData",registerData);
+                                mEditor.putString("phoneNumber",phoneNumber);
+                                mEditor.putString("sex",sex);
+                                mEditor.putString("height",height);
+                                mEditor.putString("weight",weight);
+                                mEditor.putString("birthday",birthday);
+                                mEditor.putString("age",age);
+                                mEditor.putString("location",location);
+                                mEditor.putString("targetStep",targetStep);
+                                mEditor.apply();
+                                Intent intent = new Intent(LoginActivity.this, ScanBLEActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                ToastUtil.showMsg(LoginActivity.this, "密码不正确");
+                                mCbRememberPsd.setChecked(false);
+                                mEtPassword.setText("");
+                            }
+                        }
+                        break;
+                }
+            }
+        };
     }
 
 
@@ -71,7 +126,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 }else{
                     ToastUtil.showMsg(LoginActivity.this,"请先打开移动数据，不然无法登录");
                 }
-
                 break;
             case R.id.btn_register:
                 Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
@@ -179,35 +233,58 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 String nameInput = mEtName.getText().toString().trim();
 
                 ReadData readData = new DBConnection();
-                EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadCloudData(nameInput,"");
+                EnumMap<ReadData.UserInfoData,Object> userInfo = readData.ReadUserInfo(nameInput,"");
                 userInfo.entrySet().iterator();
                 psdCloud = String.valueOf(userInfo.get(ReadData.UserInfoData.password));
-                Log.d("DB_tag",psdCloud);
-                if(psdCloud.equals("null")){
-                    ToastUtil.showMsg(LoginActivity.this,"用户名未注册，请先注册");
-                    mCbRememberPsd.setChecked(false);
-                    mEtPassword.setText("");
-                }else{
-                    if(psdMD5Input.equals(psdCloud)){
-                        if(mCbRememberPsd.isChecked()){
-                            mEditor.putBoolean("is_remember",true);
-                            mEditor.putString("RememberPsd",psdMD5Input);
-                        }else{
-                            mEditor.remove("RememberPsd");
-                            mEditor.putBoolean("is_remember",false);
-                        }
-                        mEditor.putString("RememberName",nameInput);
-                        mEditor.putBoolean("has_login",true);
-                        mEditor.apply();
-                        Intent intent = new Intent(LoginActivity.this,ScanBLEActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }else{
-                        ToastUtil.showMsg(LoginActivity.this,"密码不正确");
-                        mCbRememberPsd.setChecked(false);
-                        mEtPassword.setText("");
-                    }
-                }
+                userId = String.valueOf(userInfo.get(ReadData.UserInfoData.userId));
+                registerData = String.valueOf(userInfo.get(ReadData.UserInfoData.registerDate));
+                phoneNumber = String.valueOf(userInfo.get(ReadData.UserInfoData.phoneNumber));
+                sex = String.valueOf(userInfo.get(ReadData.UserInfoData.sex));
+                height = String.valueOf(userInfo.get(ReadData.UserInfoData.height));
+                weight = String.valueOf(userInfo.get(ReadData.UserInfoData.weight));
+                birthday = String.valueOf(userInfo.get(ReadData.UserInfoData.birthday));
+                age = String.valueOf(userInfo.get(ReadData.UserInfoData.age));
+                location = String.valueOf(userInfo.get(ReadData.UserInfoData.location));
+                targetStep = String.valueOf(userInfo.get(ReadData.UserInfoData.targetStep));
+                Message message = new Message();
+                message.what = MessageText;
+                handler.sendMessage(message);
+//                Log.d("DB_tag",psdCloud);
+//                if(psdCloud.equals("null")){
+//                    ToastUtil.showMsg(LoginActivity.this,"用户名未注册，请先注册");
+//                    mCbRememberPsd.setChecked(false);
+//                    mEtPassword.setText("");
+//                }else{
+//                    if(psdMD5Input.equals(psdCloud)){
+//                        if(mCbRememberPsd.isChecked()){
+//                            mEditor.putBoolean("is_remember",true);
+//                            mEditor.putString("RememberPsd",psdMD5Input);
+//                        }else{
+//                            mEditor.remove("RememberPsd");
+//                            mEditor.putBoolean("is_remember",false);
+//                        }
+//                        mEditor.putString("RememberName",nameInput);
+////                        mEditor.putString("userId",userId);
+////                        mEditor.putString("registerTime",registerTime);
+////                        mEditor.putString("phoneNumber",phoneNumber);
+////                        mEditor.putString("sex",sex);
+////                        mEditor.putString("height",height);
+////                        mEditor.putString("weight",weight);
+////                        mEditor.putString("birthday",birthday);
+////                        mEditor.putString("age",age);
+////                        mEditor.putString("location",location);
+////                        mEditor.putString("targetStep",targetStep);
+//                        mEditor.putBoolean("has_login",true);
+//                        mEditor.apply();
+//                        Intent intent = new Intent(LoginActivity.this,ScanBLEActivity.class);
+//                        startActivity(intent);
+//                        finish();
+//                    }else{
+//                        ToastUtil.showMsg(LoginActivity.this,"密码不正确");
+//                        mCbRememberPsd.setChecked(false);
+//                        mEtPassword.setText("");
+//                    }
+//                }
             }
         }).start();
 

@@ -1,31 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_updateStep"
+    <LinearLayout
+        android:id="@+id/layout_step"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal">
+        <TextView
+            android:id="@+id/tv_updateStep"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:textSize="60sp"
+            android:textColor="@color/colorBlack"
+            android:gravity="center"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/textview_circle"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="50sp"
+        android:layout_below="@id/layout_step"
         android:gravity="center_horizontal"
-        android:layout_marginTop="50dp"/>
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tv_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="再次扫描手环蓝牙"
+            android:textSize="20sp"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="20dp"/>
 
-    <TextView
-        android:id="@+id/tv_error"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="再次扫描手环蓝牙"
-        android:textSize="20sp"
-        android:gravity="center_horizontal"
-        android:layout_below="@id/tv_updateStep"
-        android:layout_marginTop="20dp"/>
+        <Button
+            android:id="@+id/btn_floatBle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_error"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="浮窗"
+            android:background="@drawable/textview_stroke_float"/>
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_floatBle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_error"
-        android:layout_marginTop="20dp"
-        android:text="浮窗"/>
 </RelativeLayout>

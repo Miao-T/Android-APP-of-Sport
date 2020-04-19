@@ -18,6 +18,7 @@ import com.example.login_register.AlterUserInfoActivity;
 import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.DeviceActivity;
 import com.example.login_register.R;
+import com.example.login_register.RegisterUserInfoActivity;
 import com.example.login_register.SettingActivity;
 import com.example.login_register.Utils.ReadData;
 
@@ -97,7 +98,8 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         Intent intent = null;
         switch (v.getId()){
             case R.id.btn_myInfo:
-                intent = new Intent(getActivity(), AlterUserInfoActivity.class);
+                intent = new Intent(getActivity(), RegisterUserInfoActivity.class);
+                intent.putExtra("flag","2");
                 startActivity(intent);
                 break;
             case R.id.btn_deviceInfo:
