@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="20dp">
     <TextView
         android:id="@+id/tv_userName"
         android:layout_width="match_parent"
@@ -35,7 +36,8 @@
         android:layout_height="60dp"
         android:text="用户信息"
         android:textSize="30sp"
-        android:layout_below="@id/tv_step"/>
+        android:layout_below="@id/tv_step"
+        android:background="@drawable/textview_stroke_float"/>
 
     <Button
         android:id="@+id/btn_deviceInfo"
@@ -44,7 +46,8 @@
         android:text="设备信息"
         android:textSize="30sp"
         android:layout_below="@id/btn_myInfo"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="10dp"
+        android:background="@drawable/textview_stroke_float"/>
 
     <Button
         android:id="@+id/btn_setting"
@@ -53,7 +56,8 @@
         android:text="设置"
         android:textSize="30sp"
         android:layout_below="@id/btn_deviceInfo"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="10dp"
+        android:background="@drawable/textview_stroke_float"/>
 
 <!--    <Button-->
 <!--        android:id="@+id/btn_offline"-->
@@ -82,6 +86,7 @@
             android:layout_height="60dp"
             android:text="退出账号"
             android:textSize="30sp"
-            android:textAllCaps="false"/>
+            android:textAllCaps="false"
+            android:background="@drawable/textview_stroke_float"/>
     </LinearLayout>
 </RelativeLayout>

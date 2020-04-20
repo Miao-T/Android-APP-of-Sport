@@ -25,7 +25,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class HomeFragment extends Fragment {
 
     private TextView mTvUpdateStep;
-//    private TextView mTvError;
+    private TextView mTvError;
     private Button mBtnFloatBle;
 
     private SharedPreferences mSharedPreferences;
@@ -43,13 +43,13 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTvUpdateStep = view.findViewById(R.id.tv_updateStep);
-//        mTvError = view.findViewById(R.id.tv_error);
+        mTvError = view.findViewById(R.id.tv_error);
         mBtnFloatBle = view.findViewById(R.id.btn_floatBle);
-        //mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
         mTvUpdateStep.setText("- -");
-        //mTvError.setVisibility(View.INVISIBLE);
+        mTvError.setVisibility(View.INVISIBLE);
         mBtnFloatBle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

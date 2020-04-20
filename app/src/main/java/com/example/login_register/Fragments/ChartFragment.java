@@ -3,6 +3,7 @@ package com.example.login_register.Fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,14 +18,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.login_register.CloudSQL.DBConnection;
+import com.example.login_register.MPAndroidChart.MyFormatter;
 import com.example.login_register.R;
 import com.example.login_register.Utils.DateUtil;
 import com.example.login_register.Utils.ToastUtil;
 import com.example.login_register.Utils.WeekUtil;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import org.w3c.dom.Text;
 
@@ -53,10 +60,16 @@ public class ChartFragment extends Fragment{
     private int year,month,day,week;
     private String dateToday,weekToday,weekCheck;
     private int flag_date = 1;
+    private String targetStep;
     //private int totalNum = 0, averageNum = 0;
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
+
+    private Handler handler;
+    private static final int MessageText1 = 1;
+    private static final int MessageText2 = 2;
+    private static final int MessageText3 = 3;
 
     @Nullable
     @Override
@@ -83,9 +96,11 @@ public class ChartFragment extends Fragment{
                 DBConnection.DriverConnection();
             }
         }).start();
+
         mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
         loginName = mSharedPreferences.getString("RememberName",null);
+        targetStep = mSharedPreferences.getString("targetStep",null);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         final Date date = new Date(System.currentTimeMillis());
@@ -96,6 +111,59 @@ public class ChartFragment extends Fragment{
 
         ChoiceDate();
         ReadFromDB1();
+
+        handler = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case MessageText1:
+                        chartDecoration();
+                        DrawChart1();
+                        break;
+                    case MessageText2:
+                        chartDecoration();
+                        DrawChart2();
+                        break;
+                    case MessageText3:
+                        chartDecoration();
+                        DrawChart3();
+                        break;
+                }
+            }
+        };
+    }
+
+    private void chartDecoration(){
+        barChart.getDescription().setEnabled(false);
+        barChart.setPinchZoom(true);
+        barChart.setExtraBottomOffset(10);
+        barChart.setExtraTopOffset(30);
+        barChart.setFitBars(true);
+        barChart.animateY(1500);
+
+        XAxis xAxis = barChart.getXAxis();//获取x轴
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);//设置X轴标签显示位置
+        xAxis.setDrawGridLines(false);//不绘制格网线
+        xAxis.setGranularity(1f);//设置最小间隔，防止当放大时，出现重复标签。
+        xAxis.setCenterAxisLabels(true);
+//        MyFormatter myFormatter = new MyFormatter();
+//        xAxis.setValueFormatter(myFormatter.getFormattedValue())
+
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setDrawGridLines(true);
+
+        YAxis rightAxis = barChart.getAxisRight();
+        rightAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        rightAxis.setAxisMinimum(0f);
+        rightAxis.setDrawGridLines(true);
+
+        LimitLine yLimitLie = new LimitLine(Float.parseFloat(targetStep),"每日目标步数");
+        yLimitLie.setLineColor(getResources().getColor(R.color.colorAccent));
+        yLimitLie.setTextColor(getResources().getColor(R.color.colorBlack));
+        leftAxis.addLimitLine(yLimitLie);
     }
 
     private void ChoiceDate(){
@@ -254,7 +322,9 @@ public class ChartFragment extends Fragment{
             public void run() {
                 String dateShow = mTvDate.getText().toString().substring(0,10);
                 list = DBConnection.ReadStepHour(dateShow,loginName);
-                DrawChart1();
+                Message message = new Message();
+                message.what = MessageText1;
+                handler.sendMessage(message);
             }
         }).start();
     }
@@ -320,7 +390,10 @@ public class ChartFragment extends Fragment{
                 }
                 sql = "(" + sql.substring(0,sql.length()-3) + ")";
                 list = DBConnection.ReadStepWeekly(startDay,sql,loginName);
-                DrawChart2();
+
+                Message message = new Message();
+                message.what = MessageText2;
+                handler.sendMessage(message);
             }
         }).start();
     }
@@ -359,7 +432,9 @@ public class ChartFragment extends Fragment{
             public void run() {
                 String dateShow = mTvDate.getText().toString().substring(0,7);
                 list = DBConnection.ReadStepDaily(dateShow,loginName);
-                DrawChart3();
+                Message message = new Message();
+                message.what = MessageText3;
+                handler.sendMessage(message);
             }
         }).start();
     }

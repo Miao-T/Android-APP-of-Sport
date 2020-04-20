@@ -13,15 +13,15 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomBar" />
 
-    <TextView
-        android:layout_below="@id/contentContainer"
-        android:id="@+id/tv_error"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="请检查手环和手机蓝牙是否打开\n点击再次连接"
-        android:textSize="20sp"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
+<!--    <TextView-->
+<!--        android:layout_below="@id/contentContainer"-->
+<!--        android:id="@+id/tv_error"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="请检查手环和手机蓝牙是否打开\n点击再次连接"-->
+<!--        android:textSize="20sp"-->
+<!--        android:gravity="center_horizontal"-->
+<!--        android:layout_marginTop="20dp"/>-->
 
     <com.roughike.bottombar.BottomBar
         android:id="@+id/bottomBar"

@@ -78,7 +78,7 @@ public class MainActivity extends BaseActivity{
     private ChartFragment chartFragment;
     private FriendFragment friendFragment;
     private Fragment mCurrentFragment;
-    private TextView mTvError;
+    //private TextView mTvError;
 
     private List<BluetoothDevice> mDatas;
     private List<Integer> mRssis;
@@ -140,9 +140,9 @@ public class MainActivity extends BaseActivity{
         mDatas = new ArrayList<>();
         mRssis = new ArrayList<>();
 
-        mTvError = findViewById(R.id.tv_error);
-        mTvError.setVisibility(View.INVISIBLE);
-        mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+//        mTvError = findViewById(R.id.tv_error);
+//        mTvError.setVisibility(View.INVISIBLE);
+//        mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         getData();
 
         if(flag_finishScan){
@@ -153,16 +153,6 @@ public class MainActivity extends BaseActivity{
         }
 
         initFragment();
-
-
-//        TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
-//        mTvError.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                scanDevice();
-//            }
-//        });
-
     }
 
     private void getData(){
@@ -296,8 +286,19 @@ public class MainActivity extends BaseActivity{
                 mBluetoothAdapter.stopLeScan(scanCallback);
                 Log.d(TAG,"7s");
                 if(!flag_scan_succeed){
+                    TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
                     mTvError.setVisibility(View.VISIBLE);
                     ToastUtil.showMsg(MainActivity.this,"未找到手环设备，请检查");
+                    mTvError.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(flag_gatt){
+                                mBluetoothGatt.disconnect();
+                                mBluetoothGatt.close();
+                            }
+                            scanDevice();
+                        }
+                    });
                     Log.d(TAG,"scan fail");
                 }
             }
@@ -380,23 +381,45 @@ public class MainActivity extends BaseActivity{
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
                             mTvError.setVisibility(View.INVISIBLE);
                         }
                     });
                 }else if(newState == BluetoothGatt.STATE_DISCONNECTED){
                     Log.d(TAG,"STATE_DISCONNECTED");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
+                            mTvError.setVisibility(View.VISIBLE);
+                            mTvError.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mBluetoothGatt.close();
+                                    scanDevice();
+                                }
+                            });
+                        }
+                    });
                     return;
                 }
             }else{
                 //连接失败
+                mBluetoothGatt.close();
                 Log.d(TAG,"失败=="+status);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
                         mTvError.setVisibility(View.VISIBLE);
+                        mTvError.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                scanDevice();
+                            }
+                        });
                     }
                 });
-                mBluetoothGatt.close();
                 //否则重复连接会报133连接失败
             }
         }
@@ -419,6 +442,7 @@ public class MainActivity extends BaseActivity{
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
                     mTvError.setVisibility(View.INVISIBLE);
                 }
             });
@@ -427,7 +451,16 @@ public class MainActivity extends BaseActivity{
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
                         mTvError.setVisibility(View.VISIBLE);
+                        mTvError.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mBluetoothGatt.disconnect();
+                                mBluetoothGatt.close();
+                                scanDevice();
+                            }
+                        });
                     }
                 });
             }

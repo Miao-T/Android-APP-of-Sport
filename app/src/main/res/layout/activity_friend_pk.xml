@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="30sp"
+        android:textColor="@color/colorBlack"
         android:gravity="center_horizontal"
         android:layout_marginTop="50dp"/>
 
@@ -35,7 +36,8 @@
             android:layout_toRightOf="@id/btn_choiceLeft"
             android:gravity="center"
             android:text=""
-            android:textSize="30sp"
+            android:textSize="15sp"
+            android:textColor="@color/colorBlack"
             android:layout_weight="7"/>
         <Button
             android:id="@+id/btn_choiceRight_pk"
@@ -65,7 +67,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
+        android:gravity="center"/>
 
     <TextView
         android:id="@+id/tv_pk_result"
@@ -73,6 +77,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:textSize="30sp"/>
-
+        android:textSize="30sp"
+        android:textColor="@color/colorBlack"
+        android:gravity="center"/>
 </RelativeLayout>

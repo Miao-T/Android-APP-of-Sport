@@ -1,5 +1,6 @@
 package com.example.login_register;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 
@@ -39,6 +41,8 @@ public class BarActivity extends BaseActivity {
 
     private BarChart barChart;
     private List list;
+    private Handler handler;
+    private static final int MessageText = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,53 +75,59 @@ public class BarActivity extends BaseActivity {
         barChart.setFitBars(true);
         barChart.animateY(2000);
 
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                DBConnection.DriverConnection();
-//                DBConnection.ReadStepHour("2020-04","lindidi");
-//                DrawChart();
-//                //list = DBConnection.ReadStep("2020-04-16","t");
-////                for(int i = 0; i < list.size(); i++){
-////                    Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
-////                }
-//            }
-//        }).start();
+        handler = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case MessageText:
+                        DrawChart();
+                        break;
+                }
+            }
+        };
 
-//        Handler handler = new Handler();
-//        Runnable runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.d("DB_tag","drawChart");
-//                DrawChart();
-//            }
-//        };
-//        handler.postDelayed(runnable,3000);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DBConnection.DriverConnection();
+                list = DBConnection.ReadStepHour("2020-04-17","lindidi");
 
-        barChart.setDrawBorders(true);
-        //设置数据
-        List<BarEntry> entries = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            float a = (float) (Math.random()) * 80;
-            entries.add(new BarEntry(i, (float) (Math.random()) * 80));
-            Log.d("DB_tag",String.valueOf(a));
-        }
-        //一个LineDataSet就是一条线
-        String name = "步数";
-        BarDataSet barDataSet = new BarDataSet(entries,name);
-        BarData data = new BarData(barDataSet);
-        barChart.setData(data);
+                Message message = new Message();
+                message.what = MessageText;
+                handler.sendMessage(message);
+                //DrawChart();
+                //list = DBConnection.ReadStep("2020-04-16","t");
+//                for(int i = 0; i < list.size(); i++){
+//                    Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
+//                }
+            }
+        }).start();
+
+//        barChart.setDrawBorders(true);
+//        //设置数据
+//        List<BarEntry> entries = new ArrayList<>();
+//        for (int i = 0; i < 10; i++) {
+//            float a = (float) (Math.random()) * 80;
+//            entries.add(new BarEntry(i, (float) (Math.random()) * 80));
+//            Log.d("DB_tag",String.valueOf(a));
+//        }
+//        //一个LineDataSet就是一条线
+//        String name = "步数";
+//        BarDataSet barDataSet = new BarDataSet(entries,name);
+//        BarData data = new BarData(barDataSet);
+//        barChart.setData(data);
     }
 
     private void DrawChart(){
         barChart.setDrawBorders(true);
         List<BarEntry> barEntries = new ArrayList<>();
-        for(int i = 0; i < 30; i++){
-            Log.d("DB_tag",String.valueOf(i));
-            Log.d("DB_tag",String.valueOf(list.get(i)));
-            if(list.get(i).equals("0")){
+        for(int i = 0; i < 24; i++){
+            if(i >= list.size()){
                 barEntries.add(new BarEntry(i,Float.parseFloat("0")));
             }else{
+                //totalNum = Integer.parseInt(String.valueOf(list.get(i))) + totalNum;
+                Log.d("drawChart", String.valueOf(list.get(i)));
                 String step = String.valueOf(list.get(i));
                 Log.d("DB_tag","list  " + step);
                 barEntries.add(new BarEntry(i,Float.parseFloat(step)));

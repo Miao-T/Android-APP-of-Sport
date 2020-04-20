@@ -21,26 +21,26 @@ public class MyFormatter implements IAxisValueFormatter{
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
         if (value == 1){
-            return "Monday";
+            return "一";
         }
         if (value == 2) {
-            return "Tuesday";
+            return "二";
         }
         if (value == 3) {
-            return "Wednesday";
+            return "三";
         }
         if (value == 4) {
-            return "Thursday";
+            return "四";
         }
         if (value == 5) {
-            return "Friday";
+            return "五";
         }
         if (value == 6) {
-            return "Saturday";
+            return "六";
         }
-//        if (value == 7) {
-//            return "Sunday";
-//        }
+        if (value == 0) {
+            return "日";
+        }
         return "";
     }
 

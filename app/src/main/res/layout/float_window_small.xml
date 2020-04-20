@@ -10,6 +10,7 @@
         android:layout_height="fill_parent"
         android:gravity="center"
         android:background="@drawable/textview_circle_float"
-        android:textSize="25sp" />
+        android:textSize="25sp"
+        android:textColor="@color/colorBlack"/>
 
 </LinearLayout>
