@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -77,6 +78,7 @@ public class MainActivity extends BaseActivity{
     private ChartFragment chartFragment;
     private FriendFragment friendFragment;
     private Fragment mCurrentFragment;
+    private TextView mTvError;
 
     private List<BluetoothDevice> mDatas;
     private List<Integer> mRssis;
@@ -138,6 +140,9 @@ public class MainActivity extends BaseActivity{
         mDatas = new ArrayList<>();
         mRssis = new ArrayList<>();
 
+        mTvError = findViewById(R.id.tv_error);
+        mTvError.setVisibility(View.INVISIBLE);
+        mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         getData();
 
         if(flag_finishScan){
@@ -148,6 +153,16 @@ public class MainActivity extends BaseActivity{
         }
 
         initFragment();
+
+
+//        TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
+//        mTvError.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                scanDevice();
+//            }
+//        });
+
     }
 
     private void getData(){
@@ -220,31 +235,31 @@ public class MainActivity extends BaseActivity{
                         hideFragment(fragmentTransaction);
                         fragmentTransaction.show(homeFragment).commit();
                         mCurrentFragment = homeFragment;
-                        ToastUtil.showMsg(MainActivity.this,"tag1");
+                        //ToastUtil.showMsg(MainActivity.this,"tag1");
                         break;
                     case R.id.tab2:
                         hideFragment(fragmentTransaction);
                         fragmentTransaction.show(mainFragment).commit();
                         mCurrentFragment = mainFragment;
-                        ToastUtil.showMsg(MainActivity.this,"tag2");
+                        //ToastUtil.showMsg(MainActivity.this,"tag2");
                         break;
                     case R.id.tab3:
                         hideFragment(fragmentTransaction);
                         fragmentTransaction.show(chartFragment).commit();
                         mCurrentFragment = chartFragment;
-                        ToastUtil.showMsg(MainActivity.this,"tag3");
+                        //ToastUtil.showMsg(MainActivity.this,"tag3");
                         break;
                     case R.id.tab4:
                         hideFragment(fragmentTransaction);
                         fragmentTransaction.show(friendFragment).commit();
                         mCurrentFragment = friendFragment;
-                        ToastUtil.showMsg(MainActivity.this,"tag4");
+                        //ToastUtil.showMsg(MainActivity.this,"tag4");
                         break;
                     case R.id.tab5:
                         hideFragment(fragmentTransaction);
                         fragmentTransaction.show(mineFragment).commit();
                         mCurrentFragment = mineFragment;
-                        ToastUtil.showMsg(MainActivity.this,"tag5");
+                        //ToastUtil.showMsg(MainActivity.this,"tag5");
                         break;
                 }
             }
@@ -281,7 +296,6 @@ public class MainActivity extends BaseActivity{
                 mBluetoothAdapter.stopLeScan(scanCallback);
                 Log.d(TAG,"7s");
                 if(!flag_scan_succeed){
-                    TextView mTvError = homeFragment.getView().findViewById(R.id.tv_error);
                     mTvError.setVisibility(View.VISIBLE);
                     ToastUtil.showMsg(MainActivity.this,"未找到手环设备，请检查");
                     Log.d(TAG,"scan fail");
@@ -359,16 +373,16 @@ public class MainActivity extends BaseActivity{
             Log.d(TAG, String.valueOf( BluetoothGatt.STATE_DISCONNECTED));
             if (status == BluetoothGatt.GATT_SUCCESS){
                 //连接成功
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //mTvNotFindBle.setVisibility(View.INVISIBLE);
-                    }
-                });
                 if (newState == BluetoothGatt.STATE_CONNECTED){
                     Log.d(TAG,"连接成功");
                     //发现服务
                     gatt.discoverServices();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTvError.setVisibility(View.INVISIBLE);
+                        }
+                    });
                 }else if(newState == BluetoothGatt.STATE_DISCONNECTED){
                     Log.d(TAG,"STATE_DISCONNECTED");
                     return;
@@ -379,7 +393,7 @@ public class MainActivity extends BaseActivity{
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //mTvNotFindBle.setVisibility(View.VISIBLE);
+                        mTvError.setVisibility(View.VISIBLE);
                     }
                 });
                 mBluetoothGatt.close();
@@ -405,14 +419,17 @@ public class MainActivity extends BaseActivity{
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //searchView.setVisibility(View.GONE);
-                    //operaView.setVisibility(View.VISIBLE);
-                    //mTvNotFindBle.setVisibility(View.INVISIBLE);
+                    mTvError.setVisibility(View.INVISIBLE);
                 }
             });
             if(status != BluetoothGatt.GATT_SUCCESS){
                 Log.d(TAG,"unsucceed"+ status);
-                //mTvNotFindBle.setVisibility(View.VISIBLE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTvError.setVisibility(View.VISIBLE);
+                    }
+                });
             }
         }
 

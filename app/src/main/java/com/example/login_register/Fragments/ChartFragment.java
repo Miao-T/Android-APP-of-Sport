@@ -37,6 +37,7 @@ import java.util.List;
 import cn.smssdk.gui.IdentifyNumPage;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.STORAGE_SERVICE;
 
 public class ChartFragment extends Fragment{
     private final static String TAG = "chart";
@@ -45,11 +46,14 @@ public class ChartFragment extends Fragment{
     private TextView mTvDate;
     private Button mBtnLeft;
     private Button mBtnRight;
+    private TextView mTvDataShowTotal;
+    private TextView mTvDataShowAverage;
     private List list;
     private String loginName;
     private int year,month,day,week;
     private String dateToday,weekToday,weekCheck;
     private int flag_date = 1;
+    //private int totalNum = 0, averageNum = 0;
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
@@ -70,6 +74,8 @@ public class ChartFragment extends Fragment{
         mTvDate = view.findViewById(R.id.tv_date);
         mBtnLeft = view.findViewById(R.id.btn_choiceLeft);
         mBtnRight = view.findViewById(R.id.btn_choiceRight);
+        mTvDataShowTotal = view.findViewById(R.id.tv_data_show1);
+        mTvDataShowAverage = view.findViewById(R.id.tv_data_show2);
 
         new Thread(new Runnable() {
             @Override
@@ -254,23 +260,29 @@ public class ChartFragment extends Fragment{
     }
 
     private void DrawChart1() {
+        barChart.invalidate();
         barChart.setDrawBorders(true);
+        //barChart.setDrawGridBackground(false);
         List<BarEntry> barEntries = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
             Log.d("drawChart", String.valueOf(i));
             if(i >= list.size()){
                 barEntries.add(new BarEntry(i,Float.parseFloat("0")));
             }else{
+                //totalNum = Integer.parseInt(String.valueOf(list.get(i))) + totalNum;
                 Log.d("drawChart", String.valueOf(list.get(i)));
                 String step = String.valueOf(list.get(i));
                 Log.d("DB_tag","list  " + step);
                 barEntries.add(new BarEntry(i,Float.parseFloat(step)));
             }
         }
-        String name = "步数";
+        String name = "当日每小时步数";
         BarDataSet barDataSet = new BarDataSet(barEntries, name);
+        //initBarDataSet(barDataSet,getResources().getColor(R.color.colorBlack));
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
+        //averageNum = totalNum / list.size();
+        //mTvDataShowTotal.setText("今日总步数 " + String.valueOf(totalNum));
         //barChart.animateXY(3000,3000);
     }
 
@@ -306,7 +318,6 @@ public class ChartFragment extends Fragment{
                         dateShow = DateUtil.addDay(year,month,day);
                     }
                 }
-
                 sql = "(" + sql.substring(0,sql.length()-3) + ")";
                 list = DBConnection.ReadStepWeekly(startDay,sql,loginName);
                 DrawChart2();
@@ -315,6 +326,8 @@ public class ChartFragment extends Fragment{
     }
 
     private void DrawChart2() {
+        barChart.invalidate();
+        //barChart.setDrawGridBackground(false);
         barChart.setDrawBorders(true);
         List<BarEntry> barEntries = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
@@ -330,10 +343,12 @@ public class ChartFragment extends Fragment{
                 barEntries.add(new BarEntry(i,Float.parseFloat(step)));
             }
         }
-        String name = "步数";
+        String name = "当周每日步数";
         BarDataSet barDataSet = new BarDataSet(barEntries, name);
+        //initBarDataSet(barDataSet,getResources().getColor(R.color.colorBlack));
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
+
         //barChart.animateXY(3000,3000);
     }
 
@@ -350,6 +365,8 @@ public class ChartFragment extends Fragment{
     }
 
     private void DrawChart3() {
+        barChart.invalidate();
+        ///barChart.setDrawGridBackground(false);
         int j= 0;
         barChart.setDrawBorders(true);
         List<BarEntry> barEntries = new ArrayList<>();
@@ -391,11 +408,19 @@ public class ChartFragment extends Fragment{
                 barEntries.add(new BarEntry(i,Float.parseFloat(step)));
             }
         }
-        String name = "步数";
+        String name = "当月每日步数";
         BarDataSet barDataSet = new BarDataSet(barEntries, name);
+        //initBarDataSet(barDataSet,getResources().getColor(R.color.colorBlack));
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
         //barChart.animateXY(3000,3000);
+    }
+
+    private void initBarDataSet(BarDataSet barDataSet,int color){
+        barDataSet.setColor(color);
+        barDataSet.setFormLineWidth(1f);
+        barDataSet.setFormSize(15.f);
+        barDataSet.setDrawValues(false);
     }
 }
 

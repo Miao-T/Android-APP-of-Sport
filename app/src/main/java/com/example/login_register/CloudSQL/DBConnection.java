@@ -721,11 +721,20 @@ public class DBConnection implements ReadData {
 
     public static void InsertStep(String date){
         Connection connection = null;
+        String sql = null;
         try{
             connection = DriverManager.getConnection(url,userName,password);
             Log.d("DB_tag","连接数据库成功！！！");
-            String dateInsert = "2020-03-" + date + " 00:00:00";
-            String sql = "INSERT INTO tlindidi(time,stepData,state) VALUES ('"+dateInsert+"','1000','1')";
+            String dateInsert = "2020-04-" + date + " 00:00:00";
+            if(Integer.parseInt(date)%4 == 0){
+                sql = "INSERT INTO tnunuwa(time,stepData,state) VALUES ('"+dateInsert+"','1000','1')";
+            }else if(Integer.parseInt(date)%4 == 1){
+                sql = "INSERT INTO tnunuwa(time,stepData,state) VALUES ('"+dateInsert+"','1200','1')";
+            }else if(Integer.parseInt(date)%4 == 1){
+                sql = "INSERT INTO tnunuwa(time,stepData,state) VALUES ('"+dateInsert+"','400','1')";
+            }else{
+                sql = "INSERT INTO tnunuwa(time,stepData,state) VALUES ('"+dateInsert+"','700','1')";
+            }
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.execute(sql);
         }catch (Exception e){

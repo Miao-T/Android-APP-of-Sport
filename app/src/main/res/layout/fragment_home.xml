@@ -27,14 +27,14 @@
         android:layout_below="@id/layout_step"
         android:gravity="center_horizontal"
         android:orientation="vertical">
-        <TextView
-            android:id="@+id/tv_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="再次扫描手环蓝牙"
-            android:textSize="20sp"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="20dp"/>
+<!--        <TextView-->
+<!--            android:id="@+id/tv_error"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="请检查手环和手机蓝牙是否打开\n点击再次连接"-->
+<!--            android:textSize="20sp"-->
+<!--            android:gravity="center_horizontal"-->
+<!--            android:layout_marginTop="20dp"/>-->
 
         <Button
             android:id="@+id/btn_floatBle"

@@ -4,37 +4,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
-    android:layout_marginTop="60dp">
+    android:layout_marginTop="20dp">
 
     <RelativeLayout
         android:id="@+id/btn_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center">
         <RadioGroup
             android:id="@+id/rg_choice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center">
             <RadioButton
                 android:id="@+id/rb_day"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="每日"
+                android:textSize="20sp"
+                android:gravity="center"
                 android:layout_weight="1"
-                android:checked="true"/>
+                android:checked="true"
+                android:button="@null"
+                android:background="@drawable/radio_button_selector"/>
             <RadioButton
                 android:id="@+id/rb_week"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="每周"
-                android:layout_weight="1"/>
+                android:textSize="20sp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:button="@null"
+                android:background="@drawable/radio_button_selector"/>
             <RadioButton
                 android:id="@+id/rb_month"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="每月"
-                android:layout_weight="1"/>
+                android:textSize="20sp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:button="@null"
+                android:background="@drawable/radio_button_selector"/>
         </RadioGroup>
     </RelativeLayout>
 
@@ -59,6 +73,7 @@
             android:gravity="center"
             android:text=""
             android:textSize="15sp"
+            android:textColor="@color/colorBlack"
             android:layout_weight="7"/>
         <Button
             android:id="@+id/btn_choiceRight"
@@ -82,6 +97,7 @@
 
 
     <RelativeLayout
+        android:id="@+id/layout_5"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_below="@id/date_layout"
@@ -92,5 +108,21 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_data_show1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_below="@id/layout_5"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/tv_data_show2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/tv_data_show1"
+        android:textSize="20sp"/>
 
 </RelativeLayout>

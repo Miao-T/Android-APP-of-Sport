@@ -45,19 +45,44 @@ public class BarActivity extends BaseActivity {
         setContentView(R.layout.activity_bar);
 
         barChart = findViewById(R.id.bar_chart);
+        barChart.getDescription().setEnabled(false);
+        barChart.setPinchZoom(true);
+        //x坐标轴设置
+        //IAxisValueFormatter xAxisFormatter = new StringAxisValueFormatter(xAxisValue);//设置自定义的x轴值格式化器
+        XAxis xAxis = barChart.getXAxis();//获取x轴
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);//设置X轴标签显示位置
+        xAxis.setDrawGridLines(false);//不绘制格网线
+        xAxis.setGranularity(1f);//设置最小间隔，防止当放大时，出现重复标签。
+        //xAxis.setValueFormatter(xAxisFormatter);
+        //xAxis.setTextSize(xAxisTextSize);//设置标签字体大小
+        //xAxis.setLabelCount(xAxisValue.size());//设置标签显示的个数
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                DBConnection.DriverConnection();
-                DBConnection.ReadStepHour("2020-04","lindidi");
-                DrawChart();
-                //list = DBConnection.ReadStep("2020-04-16","t");
-//                for(int i = 0; i < list.size(); i++){
-//                    Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
-//                }
-            }
-        }).start();
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setDrawGridLines(true);
+
+
+        YAxis rightAxis = barChart.getAxisRight();
+        rightAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        rightAxis.setAxisMinimum(0f);
+        rightAxis.setDrawGridLines(true);
+
+        barChart.setFitBars(true);
+        barChart.animateY(2000);
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                DBConnection.DriverConnection();
+//                DBConnection.ReadStepHour("2020-04","lindidi");
+//                DrawChart();
+//                //list = DBConnection.ReadStep("2020-04-16","t");
+////                for(int i = 0; i < list.size(); i++){
+////                    Log.d("DB_tag","list  " + String.valueOf(list.get(i)));
+////                }
+//            }
+//        }).start();
 
 //        Handler handler = new Handler();
 //        Runnable runnable = new Runnable() {
@@ -69,19 +94,19 @@ public class BarActivity extends BaseActivity {
 //        };
 //        handler.postDelayed(runnable,3000);
 
-//        barChart.setDrawBorders(true);
-//        //设置数据
-//        List<BarEntry> entries = new ArrayList<>();
-//        for (int i = 0; i < 10; i++) {
-//            float a = (float) (Math.random()) * 80;
-//            entries.add(new BarEntry(i, (float) (Math.random()) * 80));
-//            Log.d("DB_tag",String.valueOf(a));
-//        }
-//        //一个LineDataSet就是一条线
-//        String name = "步数";
-//        BarDataSet barDataSet = new BarDataSet(entries,name);
-//        BarData data = new BarData(barDataSet);
-//        barChart.setData(data);
+        barChart.setDrawBorders(true);
+        //设置数据
+        List<BarEntry> entries = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            float a = (float) (Math.random()) * 80;
+            entries.add(new BarEntry(i, (float) (Math.random()) * 80));
+            Log.d("DB_tag",String.valueOf(a));
+        }
+        //一个LineDataSet就是一条线
+        String name = "步数";
+        BarDataSet barDataSet = new BarDataSet(entries,name);
+        BarData data = new BarData(barDataSet);
+        barChart.setData(data);
     }
 
     private void DrawChart(){

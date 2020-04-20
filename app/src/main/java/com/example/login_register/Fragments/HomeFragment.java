@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.login_register.BLEActivity;
+import com.example.login_register.MainActivity;
 import com.example.login_register.R;
 import com.example.login_register.Service.FloatWindowService;
 import com.example.login_register.Utils.ActivityCollector;
@@ -24,7 +25,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class HomeFragment extends Fragment {
 
     private TextView mTvUpdateStep;
-    private TextView mTvError;
+//    private TextView mTvError;
     private Button mBtnFloatBle;
 
     private SharedPreferences mSharedPreferences;
@@ -42,13 +43,13 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTvUpdateStep = view.findViewById(R.id.tv_updateStep);
-        mTvError = view.findViewById(R.id.tv_error);
+//        mTvError = view.findViewById(R.id.tv_error);
         mBtnFloatBle = view.findViewById(R.id.btn_floatBle);
-        mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        //mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
         mTvUpdateStep.setText("- -");
-
+        //mTvError.setVisibility(View.INVISIBLE);
         mBtnFloatBle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,13 +57,6 @@ public class HomeFragment extends Fragment {
                 getActivity().startService(intent);
                 getActivity().moveTaskToBack(true);
                 //ActivityCollector.finishAll();
-            }
-        });
-
-        mTvError.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
             }
         });
     }

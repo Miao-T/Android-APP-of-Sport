@@ -47,7 +47,7 @@ import java.util.List;
 public class RegisterUserInfoActivity extends BaseActivity implements View.OnClickListener{
     private static final String TAG = "userInfo_tag";
     private RadioGroup mRgSex;
-    private RadioButton mRb1,mRb2;
+    private RadioButton mRbMale,mRbFemale;
     private TextView mTvHeight,mTvWeight,mTvBirthday,mTvAddress,mTvStep;
     private Button mBtnSave;
     private TextView mTvGap;
@@ -84,7 +84,7 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
             }
         }).start();
         initView();
-        mSharedPreferences =getSharedPreferences("User",MODE_PRIVATE);
+        mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
 
         Intent intent = getIntent();
@@ -100,15 +100,15 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
             locationSR = mSharedPreferences.getString("location",null);
             targetStepSR = mSharedPreferences.getString("targetStep",null);
             if(sexSR.equals("1")){
-                mRb2.setChecked(true);
+                mRbFemale.setChecked(true);
             }else{
-                mRb1.setChecked(true);
+                mRbMale.setChecked(true);
             }
             mTvHeight.setText(heightSR + "cm");
             mTvWeight.setText(weightSR + "kg");
             mTvBirthday.setText(birthdaySR);
             mTvAddress.setText(locationSR);
-            mTvStep.setText(targetStepSR);
+            mTvStep.setText(targetStepSR + "步");
         }else{
             name = intent.getStringExtra("RegisterName");
         }
@@ -146,10 +146,10 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
 
     private void setTextViewEnableFalse(){
         mBtnSave.setVisibility(View.GONE);
-        mRb1.setEnabled(false);
-        mRb1.setClickable(false);
-        mRb2.setEnabled(false);
-        mRb2.setClickable(false);
+        mRbFemale.setEnabled(false);
+        mRbFemale.setClickable(false);
+        mRbMale.setEnabled(false);
+        mRbMale.setClickable(false);
         mTvHeight.setEnabled(false);
         mTvHeight.setClickable(false);
         mTvWeight.setEnabled(false);
@@ -166,10 +166,10 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
 
     private void setTextViewEnableTrue(){
         mBtnSave.setVisibility(View.VISIBLE);
-        mRb1.setEnabled(true);
-        mRb1.setClickable(true);
-        mRb2.setEnabled(true);
-        mRb2.setClickable(true);
+        mRbFemale.setEnabled(true);
+        mRbFemale.setClickable(true);
+        mRbMale.setEnabled(true);
+        mRbMale.setClickable(true);
         mTvHeight.setEnabled(true);
         mTvHeight.setClickable(true);
         mTvWeight.setEnabled(true);
@@ -194,8 +194,8 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
 
     private void initView(){
         mRgSex = findViewById(R.id.rg_sex);
-        mRb1 = findViewById(R.id.rb_female);
-        mRb2 = findViewById(R.id.rb_male);
+        mRbFemale = findViewById(R.id.rb_female);
+        mRbMale = findViewById(R.id.rb_male);
         mTvHeight = findViewById(R.id.tv_height);
         mTvWeight = findViewById(R.id.tv_weight);
         mTvBirthday = findViewById(R.id.tv_birthday);
@@ -222,14 +222,14 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
             case  R.id.tv_height:
                 List<String> listHeight = new ArrayList<>();
                 for (int i = 60; i < 200; i++) {
-                    listHeight.add(i + "CM");
+                    listHeight.add(i + "cm");
                 }
                 SingleOptionsPicker.openOptionsPicker(this, listHeight,1, mTvHeight);
                 break;
             case R.id.tv_weight:
                 List<String> listWeight = new ArrayList<>();
                 for (double i = 30; i < 100; i = i +0.5) {
-                    listWeight.add(i + "KG");
+                    listWeight.add(i + "kg");
                 }
                 SingleOptionsPicker.openOptionsPicker(this, listWeight,2, mTvWeight);
                 break;
@@ -267,7 +267,7 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
     }
 
     private void SaveToDatabase(){
-        if(mRb1.isChecked()){
+        if(mRbMale.isChecked()){
             sex = 2;
             //male
         }else{
@@ -283,6 +283,9 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
         weight = Double.parseDouble(strWeight.substring(0, strWeight.length() - 2));
         Log.d("register_tag",String.valueOf(weight));
         birthday = mTvBirthday.getText().toString();
+        if(birthday.length() == 9){
+            birthday = birthday.substring(0,5) + "0" + birthday.substring(5,9);
+        }
         Log.d("register_tag",String.valueOf(birthday));
         Calendar calender = Calendar.getInstance();
         yearNow = calender.get(Calendar.YEAR);
@@ -296,7 +299,7 @@ public class RegisterUserInfoActivity extends BaseActivity implements View.OnCli
         Log.d("register_tag",String.valueOf(age));
         location = mTvAddress.getText().toString();
         Log.d("register_tag",location);
-        targetStep = Integer.parseInt(mTvStep.getText().toString());
+        targetStep = Integer.parseInt(mTvStep.getText().toString().substring(0,mTvStep.getText().toString().length()-1));
         Log.d("register_tag",String.valueOf(targetStep));
         mEditor.putString("sex",String.valueOf(sex));
         mEditor.putString("height",String.valueOf(height));

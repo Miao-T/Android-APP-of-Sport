@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
+import static com.example.login_register.CloudSQL.DBConnection.InsertStep;
+
 public class AliSqlActivity extends BaseActivity{
     private EditText mEtId;
     private EditText mEtName;
@@ -73,11 +75,8 @@ public class AliSqlActivity extends BaseActivity{
                 new Thread(new Runnable() {
                 @Override
                     public void run() {
-//                        DBConnection.AddRequestList("lindidi","zhongwei","2");
-//                        DBConnection.AddRequestList("nunuwa","lindidi","0");
-//                        DBConnection.AddRequestList("tz","lindidi","1");
-//                    DBConnection.AddRequestList("tz2","lindidi","1");
-//                    DBConnection.AddRequestList("tz3","lindidi","0");
+                    String date = mEtId.getText().toString();
+                    InsertStep(date);
                 }
             }).start();
             }
