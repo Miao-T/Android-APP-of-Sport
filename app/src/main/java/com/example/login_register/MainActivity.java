@@ -40,6 +40,7 @@ import com.example.login_register.Fragments.FriendFragment;
 import com.example.login_register.Fragments.HomeFragment;
 import com.example.login_register.Fragments.MainFragment;
 import com.example.login_register.Fragments.MineFragment;
+import com.example.login_register.Fragments.TrainingFragment;
 import com.example.login_register.Friend.FriendAdapter;
 import com.example.login_register.LitePalDatabase.DailyRecord;
 import com.example.login_register.LitePalDatabase.UserInfo;
@@ -73,10 +74,11 @@ public class MainActivity extends BaseActivity{
     private long mExitTime;
 
     private HomeFragment homeFragment;
-    private MainFragment mainFragment;
+//    private MainFragment mainFragment;
     private MineFragment mineFragment;
     private ChartFragment chartFragment;
     private FriendFragment friendFragment;
+    private TrainingFragment trainingFragment;
     private Fragment mCurrentFragment;
     //private TextView mTvError;
 
@@ -109,6 +111,9 @@ public class MainActivity extends BaseActivity{
     private String DeviceMacSP;
     private String DeviceNameSP;
     public static String dataBle;
+
+    private double caloriesResult;
+
 
     public static MainActivity instance;
 
@@ -186,16 +191,18 @@ public class MainActivity extends BaseActivity{
     private void initFragment(){
         mCurrentFragment = new Fragment();
         homeFragment = new HomeFragment();
-        mainFragment = new MainFragment();
+//        mainFragment = new MainFragment();
         mineFragment = new MineFragment();
         chartFragment = new ChartFragment();
         friendFragment = new FriendFragment();
+        trainingFragment = new TrainingFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.contentContainer,homeFragment)
-                .add(R.id.contentContainer,mainFragment)
+//                .add(R.id.contentContainer,mainFragment)
                 .add(R.id.contentContainer,mineFragment)
                 .add(R.id.contentContainer,chartFragment)
                 .add(R.id.contentContainer,friendFragment)
+                .add(R.id.contentContainer,trainingFragment)
                 .commit();
         mBottomBar = findViewById(R.id.bottomBar);
 
@@ -229,14 +236,16 @@ public class MainActivity extends BaseActivity{
                         break;
                     case R.id.tab2:
                         hideFragment(fragmentTransaction);
-                        fragmentTransaction.show(mainFragment).commit();
-                        mCurrentFragment = mainFragment;
+                        fragmentTransaction.show(chartFragment).commit();
+                        mCurrentFragment = chartFragment;
+//                        fragmentTransaction.show(mainFragment).commit();
+//                        mCurrentFragment = mainFragment;
                         //ToastUtil.showMsg(MainActivity.this,"tag2");
                         break;
                     case R.id.tab3:
                         hideFragment(fragmentTransaction);
-                        fragmentTransaction.show(chartFragment).commit();
-                        mCurrentFragment = chartFragment;
+                        fragmentTransaction.show(trainingFragment).commit();
+                        mCurrentFragment = trainingFragment;
                         //ToastUtil.showMsg(MainActivity.this,"tag3");
                         break;
                     case R.id.tab4:
@@ -261,8 +270,11 @@ public class MainActivity extends BaseActivity{
         if(homeFragment != null){
             fragmentTransaction.hide(homeFragment);
         }
-        if(mainFragment != null){
-            fragmentTransaction.hide(mainFragment);
+//        if(mainFragment != null){
+//            fragmentTransaction.hide(mainFragment);
+//        }
+        if(trainingFragment != null){
+            fragmentTransaction.hide(trainingFragment);
         }
         if(mineFragment != null){
             fragmentTransaction.hide(mineFragment);
@@ -491,6 +503,8 @@ public class MainActivity extends BaseActivity{
 
             TextView mTvUpdateStep = homeFragment.getView().findViewById(R.id.tv_updateStep);
             mTvUpdateStep.setText(dataBle);
+
+
         }
     };
 

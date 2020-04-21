@@ -8,7 +8,7 @@
         android:id="@+id/layout_step"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:gravity="center_horizontal">
         <TextView
             android:id="@+id/tv_updateStep"
@@ -27,6 +27,14 @@
         android:layout_below="@id/layout_step"
         android:gravity="center_horizontal"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_step_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="30sp"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="40dp"/>
         <TextView
             android:id="@+id/tv_error"
             android:layout_width="match_parent"

@@ -32,6 +32,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
 import org.w3c.dom.Text;
 
@@ -71,6 +72,8 @@ public class ChartFragment extends Fragment{
     private static final int MessageText2 = 2;
     private static final int MessageText3 = 3;
 
+    private List<Integer> xAxisValue;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class ChartFragment extends Fragment{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        xAxisValue = new ArrayList<>();
         mRgDate = view.findViewById(R.id.rg_choice);
         barChart = view.findViewById(R.id.bar_chart);
         mTvDate = view.findViewById(R.id.tv_date);
@@ -118,15 +121,15 @@ public class ChartFragment extends Fragment{
                 super.handleMessage(msg);
                 switch (msg.what){
                     case MessageText1:
-                        chartDecoration();
                         DrawChart1();
+                        chartDecoration(MessageText1);
                         break;
                     case MessageText2:
-                        chartDecoration();
+                        chartDecoration(MessageText2);
                         DrawChart2();
                         break;
                     case MessageText3:
-                        chartDecoration();
+                        chartDecoration(MessageText3);
                         DrawChart3();
                         break;
                 }
@@ -134,7 +137,7 @@ public class ChartFragment extends Fragment{
         };
     }
 
-    private void chartDecoration(){
+    private void chartDecoration(int flag){
         barChart.getDescription().setEnabled(false);
         barChart.setPinchZoom(true);
         barChart.setExtraBottomOffset(10);
@@ -146,7 +149,11 @@ public class ChartFragment extends Fragment{
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);//设置X轴标签显示位置
         xAxis.setDrawGridLines(false);//不绘制格网线
         xAxis.setGranularity(1f);//设置最小间隔，防止当放大时，出现重复标签。
+        //xAxis.setValueFormatter(new DayAxisValewFormatter(flag));
         xAxis.setCenterAxisLabels(true);
+        //Log.d("size", String.valueOf(barEntries.size()));
+        //xAxis.setLabelCount(barEntries.size());
+        xAxis.setLabelCount(xAxisValue.size());
 //        MyFormatter myFormatter = new MyFormatter();
 //        xAxis.setValueFormatter(myFormatter.getFormattedValue())
 
@@ -330,11 +337,17 @@ public class ChartFragment extends Fragment{
     }
 
     private void DrawChart1() {
+        float groupSpace = 0.04f;
+        float barSpace = 0.03f;
+        float barWidth = 0.45f;
+
         barChart.invalidate();
         barChart.setDrawBorders(true);
         //barChart.setDrawGridBackground(false);
         List<BarEntry> barEntries = new ArrayList<>();
+
         for (int i = 0; i < 24; i++) {
+            xAxisValue.add(i);
             Log.d("drawChart", String.valueOf(i));
             if(i >= list.size()){
                 barEntries.add(new BarEntry(i,Float.parseFloat("0")));
@@ -354,6 +367,11 @@ public class ChartFragment extends Fragment{
         //averageNum = totalNum / list.size();
         //mTvDataShowTotal.setText("今日总步数 " + String.valueOf(totalNum));
         //barChart.animateXY(3000,3000);
+
+//        barChart.getBarData().setBarWidth(barWidth);
+//        barChart.getXAxis().setAxisMinimum(xAxisValue.get(0));
+//        barChart.getXAxis().setAxisMaximum(barChart.getBarData().getGroupWidth(groupSpace,barSpace) * xAxisValue.size() + xAxisValue.get(0));
+//        barChart.groupBars(xAxisValue.get(0),groupSpace,barSpace);
     }
 
         private void ReadFromDB2(){

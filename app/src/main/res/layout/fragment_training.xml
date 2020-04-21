@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layout_start"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal">
+        <TextView
+            android:id="@+id/tv_start_training"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:text=""
+            android:textSize="60sp"
+            android:textColor="@color/colorBlack"
+            android:gravity="center"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/textview_circle"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_time_training"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textColor="@color/colorBlack"
+        android:gravity="center"
+        android:layout_below="@id/layout_start"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/tv_step_training"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textColor="@color/colorBlack"
+        android:gravity="center"
+        android:layout_below="@id/tv_time_training"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/tv_calorie_training"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textColor="@color/colorBlack"
+        android:gravity="center"
+        android:layout_below="@id/tv_step_training"
+        android:layout_marginTop="10dp"/>
+
+</RelativeLayout>

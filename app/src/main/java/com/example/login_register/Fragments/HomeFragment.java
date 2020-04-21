@@ -26,6 +26,7 @@ public class HomeFragment extends Fragment {
 
     private TextView mTvUpdateStep;
     private TextView mTvError;
+    private TextView mTvStepWarning;
     private Button mBtnFloatBle;
 
     private SharedPreferences mSharedPreferences;
@@ -44,6 +45,7 @@ public class HomeFragment extends Fragment {
 
         mTvUpdateStep = view.findViewById(R.id.tv_updateStep);
         mTvError = view.findViewById(R.id.tv_error);
+        mTvStepWarning = view.findViewById(R.id.tv_step_warning);
         mBtnFloatBle = view.findViewById(R.id.btn_floatBle);
         mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
