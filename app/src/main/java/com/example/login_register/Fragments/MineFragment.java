@@ -1,5 +1,6 @@
 package com.example.login_register.Fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,14 +13,17 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.login_register.AlterUserInfoActivity;
 import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.DeviceActivity;
+import com.example.login_register.LoginActivity;
 import com.example.login_register.R;
 import com.example.login_register.RegisterUserInfoActivity;
 import com.example.login_register.SettingActivity;
+import com.example.login_register.Utils.ActivityCollector;
 import com.example.login_register.Utils.ReadData;
 
 import java.util.EnumMap;
@@ -111,10 +115,29 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.btn_offline:
-                intent = new Intent("com.example.login.FORCE_OFFLINE");
-                getActivity().sendBroadcast(intent);
-                mEditor.clear();
-                mEditor.apply();
+//                intent = new Intent("com.example.login.FORCE_OFFLINE");
+//                getActivity().sendBroadcast(intent);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("提示");
+                builder.setMessage("确定要退出账号嘛？");
+                builder.setCancelable(false);
+                builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCollector.finishAll();
+                        mEditor.clear();
+                        mEditor.apply();
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                        startActivity(intent);
+                    }
+                });
+                builder.setNeutralButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.show();
                 break;
         }
     }

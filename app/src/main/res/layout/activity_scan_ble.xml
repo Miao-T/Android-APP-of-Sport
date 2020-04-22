@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/tv1"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_marginTop="20dp"
@@ -18,29 +19,37 @@
     <ListView
         android:id="@+id/ble_list_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="600dp"
         android:layout_marginTop="20dp"
         android:divider="#cccccc"
-        android:dividerHeight="1px" />
+        android:dividerHeight="1px"
+        android:layout_below="@id/tv1"/>
 
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1"-->
+<!--        android:orientation="vertical">-->
+<!--    </LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_below="@id/ble_list_view"
         android:orientation="vertical">
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
+<!--        android:gravity="bottom"-->
         <Button
             android:id="@+id/btn_update"
             android:layout_width="150dp"
             android:layout_height="40dp"
             android:text="刷新"
             android:layout_weight="1"
-            android:background="@drawable/textview_stroke_float"/>
+            android:background="@drawable/textview_stroke_white"/>
 
         <Button
             android:id="@+id/btn_connect"
@@ -48,6 +57,6 @@
             android:layout_height="40dp"
             android:text="连接"
             android:layout_weight="1"
-            android:background="@drawable/textview_stroke_float"/>
+            android:background="@drawable/textview_stroke_white"/>
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

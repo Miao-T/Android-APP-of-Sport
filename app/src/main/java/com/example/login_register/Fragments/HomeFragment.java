@@ -48,6 +48,7 @@ public class HomeFragment extends Fragment {
         mTvStepWarning = view.findViewById(R.id.tv_step_warning);
         mBtnFloatBle = view.findViewById(R.id.btn_floatBle);
         mTvError.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+
         mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
         mTvUpdateStep.setText("- -");

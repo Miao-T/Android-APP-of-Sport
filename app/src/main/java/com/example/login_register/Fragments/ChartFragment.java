@@ -72,7 +72,7 @@ public class ChartFragment extends Fragment{
     private static final int MessageText2 = 2;
     private static final int MessageText3 = 3;
 
-    private List<Integer> xAxisValue;
+    //private List<Integer> xAxisValue;
 
     @Nullable
     @Override
@@ -84,7 +84,7 @@ public class ChartFragment extends Fragment{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        xAxisValue = new ArrayList<>();
+        //xAxisValue = new ArrayList<>();
         mRgDate = view.findViewById(R.id.rg_choice);
         barChart = view.findViewById(R.id.bar_chart);
         mTvDate = view.findViewById(R.id.tv_date);
@@ -149,13 +149,12 @@ public class ChartFragment extends Fragment{
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);//设置X轴标签显示位置
         xAxis.setDrawGridLines(false);//不绘制格网线
         xAxis.setGranularity(1f);//设置最小间隔，防止当放大时，出现重复标签。
+//        xAxis.resetAxisMinimum();
         //xAxis.setValueFormatter(new DayAxisValewFormatter(flag));
         xAxis.setCenterAxisLabels(true);
         //Log.d("size", String.valueOf(barEntries.size()));
         //xAxis.setLabelCount(barEntries.size());
-        xAxis.setLabelCount(xAxisValue.size());
-//        MyFormatter myFormatter = new MyFormatter();
-//        xAxis.setValueFormatter(myFormatter.getFormattedValue())
+        //xAxis.setLabelCount(xAxisValue.size());
 
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
@@ -337,17 +336,11 @@ public class ChartFragment extends Fragment{
     }
 
     private void DrawChart1() {
-        float groupSpace = 0.04f;
-        float barSpace = 0.03f;
-        float barWidth = 0.45f;
-
         barChart.invalidate();
         barChart.setDrawBorders(true);
         //barChart.setDrawGridBackground(false);
         List<BarEntry> barEntries = new ArrayList<>();
-
         for (int i = 0; i < 24; i++) {
-            xAxisValue.add(i);
             Log.d("drawChart", String.valueOf(i));
             if(i >= list.size()){
                 barEntries.add(new BarEntry(i,Float.parseFloat("0")));
@@ -367,11 +360,6 @@ public class ChartFragment extends Fragment{
         //averageNum = totalNum / list.size();
         //mTvDataShowTotal.setText("今日总步数 " + String.valueOf(totalNum));
         //barChart.animateXY(3000,3000);
-
-//        barChart.getBarData().setBarWidth(barWidth);
-//        barChart.getXAxis().setAxisMinimum(xAxisValue.get(0));
-//        barChart.getXAxis().setAxisMaximum(barChart.getBarData().getGroupWidth(groupSpace,barSpace) * xAxisValue.size() + xAxisValue.get(0));
-//        barChart.groupBars(xAxisValue.get(0),groupSpace,barSpace);
     }
 
         private void ReadFromDB2(){
@@ -507,13 +495,6 @@ public class ChartFragment extends Fragment{
         BarData data = new BarData(barDataSet);
         barChart.setData(data);
         //barChart.animateXY(3000,3000);
-    }
-
-    private void initBarDataSet(BarDataSet barDataSet,int color){
-        barDataSet.setColor(color);
-        barDataSet.setFormLineWidth(1f);
-        barDataSet.setFormSize(15.f);
-        barDataSet.setDrawValues(false);
     }
 }
 

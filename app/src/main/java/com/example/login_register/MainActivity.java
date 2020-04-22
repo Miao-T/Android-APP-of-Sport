@@ -110,6 +110,7 @@ public class MainActivity extends BaseActivity{
     private String LoginName;
     private String DeviceMacSP;
     private String DeviceNameSP;
+    private String targetStepSP;
     public static String dataBle;
 
     private double caloriesResult;
@@ -166,7 +167,7 @@ public class MainActivity extends BaseActivity{
         LoginName = mSharedPreferences.getString("RememberName",null);
         DeviceMacSP = mSharedPreferences.getString("DeviceMac",null);
         DeviceNameSP = mSharedPreferences.getString("DeviceName",null);
-
+        targetStepSP = mSharedPreferences.getString("targetStep",null);
 //        if(Step.equals("step")){
 //            TextView mTvUpdateStep = homeFragment.getView().findViewById(R.id.tv_updateStep);
 //            mTvUpdateStep.setText("Start");
@@ -417,6 +418,7 @@ public class MainActivity extends BaseActivity{
                 }
             }else{
                 //连接失败
+                mBluetoothGatt.disconnect();
                 mBluetoothGatt.close();
                 Log.d(TAG,"失败=="+status);
                 runOnUiThread(new Runnable() {
@@ -504,6 +506,12 @@ public class MainActivity extends BaseActivity{
             TextView mTvUpdateStep = homeFragment.getView().findViewById(R.id.tv_updateStep);
             mTvUpdateStep.setText(dataBle);
 
+            TextView mTvStepWarning = homeFragment.getView().findViewById(R.id.tv_step_warning);
+            if(Integer.parseInt(dataBle) >= Integer.parseInt(targetStepSP)){
+                mTvStepWarning.setText("您的目标步数为" + targetStepSP + "步\n您已达标");
+            }else{
+                mTvStepWarning.setText("您的目标步数为" + targetStepSP + "步\n还要加油噢");
+            }
 
         }
     };

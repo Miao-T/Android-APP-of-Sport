@@ -11,14 +11,18 @@
     <TextView
         android:id="@+id/tv_deviceName"
         android:layout_width="match_parent"
-        android:layout_height="60dp"/>
+        android:layout_height="60dp"
+        android:textColor="@color/colorBlack"
+        android:background="@drawable/textview_stroke_float"/>
 
     <TextView
         android:id="@+id/tv_deviceMAC"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_below="@id/tv_deviceName"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        android:textColor="@color/colorBlack"
+        android:background="@drawable/textview_stroke_float"/>
 
     <Button
         android:id="@+id/btn_changeBleDevice"
@@ -27,5 +31,6 @@
         android:layout_below="@id/tv_deviceMAC"
         android:layout_marginTop="100dp"
         android:text="更换手环设备"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:background="@drawable/textview_stroke_float"/>
 </RelativeLayout>
