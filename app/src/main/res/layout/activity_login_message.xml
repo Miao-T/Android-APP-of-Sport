@@ -73,6 +73,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
         <Button
             android:id="@+id/btn_loginM"
@@ -83,6 +84,7 @@
             android:textSize="20sp"
             android:textAllCaps="false"
             android:layout_marginTop="5dp"
+            android:background="@drawable/textview_stroke_float"
             android:layout_weight="1"/>
 
         <Button
@@ -94,6 +96,7 @@
             android:textSize="20sp"
             android:textAllCaps="false"
             android:layout_marginTop="5dp"
+            android:background="@drawable/textview_stroke_float"
             android:layout_weight="1"/>
     </LinearLayout>
 

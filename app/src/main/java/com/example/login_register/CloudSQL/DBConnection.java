@@ -750,6 +750,7 @@ public class DBConnection implements ReadData {
         }
     }
 
+
     public static void Drop(){
         Connection connection = null;
         try{
@@ -794,5 +795,26 @@ public class DBConnection implements ReadData {
         }
     }
 
+    public static void TrainingTable(){
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url,userName,password);
+            Log.d("DB_tag","连接数据库成功！！！");
+            //time datetime PRIMARY KEY,
+            String sql = "CREATE TABLE userTrainingList(id int AUTO_INCREMENT PRIMARY KEY,time datetime NOT NULL,trainingTime int(64) NOT NULL,stepData int(64) NOT NULL,calories double NOT NULL)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null){
+                try{
+                    connection.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 }

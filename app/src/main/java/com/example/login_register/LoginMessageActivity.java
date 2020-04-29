@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -97,6 +98,7 @@ public class LoginMessageActivity extends BaseActivity implements View.OnClickLi
         mEtMessageMod = findViewById(R.id.et_CodeM);
         mBtnGetMessage = findViewById(R.id.btn_get_message);
         mTvPsdLogin = findViewById(R.id.tv_passwordLogin);
+        mTvPsdLogin.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         mBtnLogin = findViewById(R.id.btn_loginM);
         mBtnRegister = findViewById(R.id.btn_registerM);
         mBtnGetMessage.setOnClickListener(this);

@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.login_register.AlterUserInfoActivity;
+import com.example.login_register.Calorie.CountCalorie;
 import com.example.login_register.CloudSQL.DBConnection;
 import com.example.login_register.DeviceActivity;
 import com.example.login_register.LoginActivity;
@@ -26,6 +27,8 @@ import com.example.login_register.SettingActivity;
 import com.example.login_register.Utils.ActivityCollector;
 import com.example.login_register.Utils.ReadData;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.EnumMap;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -36,7 +39,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "DB_tag" ;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    private String loginName;
+    private String loginName,registerDate,nowDate;
+    private int date;
+
 //    private int userId,sexInt,height,targetStep;
 //    private double weight;
 //    private String sex,registerTime,phoneNumber,birthday,location;
@@ -57,6 +62,14 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mSharedPreferences = getActivity().getSharedPreferences("User",MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
         loginName = mSharedPreferences.getString("RememberName","");
+        registerDate = mSharedPreferences.getString("registerData","") + " 00:00:00";
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        nowDate = simpleDateFormat.format(date);
+        Long expendTime = CountCalorie.getTimeExpend(registerDate,nowDate);
+        long longDay = expendTime/(24*3600*1000);
+//        date = Math.ceil((Date.parse(nowDate)-Date.parse(registerDate))/(24*3600*1000));
         Log.d(TAG,"fragment" + loginName);
 
 //        new Thread(new Runnable() {
@@ -93,6 +106,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mBtnOffline.setOnClickListener(this);
 
         mTvMine.setText(loginName);
+        mTvTotalDay.setText("Sloth已陪伴您" + longDay + "天啦");
         //mTvTotalDay.setText("您已使用" + "i" + "天，达标" + "j" + "天");
         //mTvStep.setText("目标步数" + targetStep);
     }

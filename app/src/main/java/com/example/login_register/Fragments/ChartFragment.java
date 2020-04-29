@@ -122,14 +122,14 @@ public class ChartFragment extends Fragment{
                 switch (msg.what){
                     case MessageText1:
                         DrawChart1();
-                        chartDecoration(MessageText1);
+                        chartDecoration();
                         break;
                     case MessageText2:
-                        chartDecoration(MessageText2);
+                        chartDecoration();
                         DrawChart2();
                         break;
                     case MessageText3:
-                        chartDecoration(MessageText3);
+                        chartDecoration();
                         DrawChart3();
                         break;
                 }
@@ -137,7 +137,7 @@ public class ChartFragment extends Fragment{
         };
     }
 
-    private void chartDecoration(int flag){
+    private void chartDecoration(){
         barChart.getDescription().setEnabled(false);
         barChart.setPinchZoom(true);
         barChart.setExtraBottomOffset(10);
@@ -149,8 +149,6 @@ public class ChartFragment extends Fragment{
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);//设置X轴标签显示位置
         xAxis.setDrawGridLines(false);//不绘制格网线
         xAxis.setGranularity(1f);//设置最小间隔，防止当放大时，出现重复标签。
-//        xAxis.resetAxisMinimum();
-        //xAxis.setValueFormatter(new DayAxisValewFormatter(flag));
         xAxis.setCenterAxisLabels(true);
         //Log.d("size", String.valueOf(barEntries.size()));
         //xAxis.setLabelCount(barEntries.size());

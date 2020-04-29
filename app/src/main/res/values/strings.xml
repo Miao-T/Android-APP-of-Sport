@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Login_Register</string>
+    <string name="app_name">Sloth</string>
     <string name="username_reminder">用户名5到10个字符</string>
     <string name="username_empty_warning">× 请填写用户名 ×</string>
     <string name="username_invalid_warning">× 用户名不符合要求 ×</string>

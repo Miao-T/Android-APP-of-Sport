@@ -2,6 +2,7 @@ package com.example.login_register;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -150,6 +151,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         mBtnRegister = findViewById(R.id.btn_register);
         mCbRememberPsd = findViewById(R.id.cb_reme);
         mTvMessage = findViewById(R.id.tv_message);
+        mTvMessage.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         //mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 //        mSharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
 //        mEditor = mSharedPreferences.edit();
